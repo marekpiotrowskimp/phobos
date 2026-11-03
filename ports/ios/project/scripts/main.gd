@@ -883,7 +883,10 @@ func _fit_camera() -> void:
 
 func _on_viewport_resized() -> void:
 	_fit_camera()
-	apply_safe_area(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size())
+	apply_safe_area(_device_safe_area(), DisplayServer.window_get_size())
+
+func _device_safe_area() -> Rect2i:
+	return SafeArea.effective(DisplayServer.get_display_safe_area(), OS.has_feature("ios"))
 
 ## Lays HUD and touch controls out inside the device safe area (notch, home indicator).
 func apply_safe_area(safe_rect: Rect2i, window_size: Vector2i) -> void:

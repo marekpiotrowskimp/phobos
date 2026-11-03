@@ -17,3 +17,9 @@ static func margins(safe_rect: Rect2i, window_size: Vector2i, visible: Vector2) 
 	result["right"] = maxf(window_size.x - safe_rect.end.x, 0.0) * scale.x
 	result["bottom"] = maxf(window_size.y - safe_rect.end.y, 0.0) * scale.y
 	return result
+
+
+## The safe area to lay out against. Only iOS reports a real one; desktop platforms return the
+## screen's usable rect (menu bar, Dock) in screen coordinates, which is not a safe area.
+static func effective(display_safe_area: Rect2i, is_ios: bool) -> Rect2i:
+	return display_safe_area if is_ios else Rect2i()
