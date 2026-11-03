@@ -6,8 +6,11 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 PROJECT_DIR="$ROOT/project"
 AMIGA_DIR="$ROOT/ports/amiga500"
+IOS_DIR="$ROOT/ports/ios/project"
 MACOS_APP="$PROJECT_DIR/build/PHOBOS.app"
 AMIGA_ADF="$AMIGA_DIR/build/PHOBOS-A500.adf"
+IOS_IPA="$IOS_DIR/build/PHOBOS.ipa"
+IOS_XCODEPROJ="$IOS_DIR/build/xcode/PHOBOS.xcodeproj"
 
 if [[ -t 1 ]]; then
 	C_INFO=$'\033[1;34m' C_OK=$'\033[1;32m' C_WARN=$'\033[1;33m' C_ERR=$'\033[1;31m' C_OFF=$'\033[0m'
@@ -29,6 +32,8 @@ Targets:
   macos   Godot export   → project/build/PHOBOS.app
   amiga   Amiga 500 port → ports/amiga500/build/PHOBOS-A500.adf
   clean   remove build outputs of both platforms
+  ios       iOS/iPadOS     → ports/ios/project/build/PHOBOS.ipa (signed, needs Apple account)
+  ios-xcode iOS/iPadOS     → ports/ios/project/build/xcode/PHOBOS.xcodeproj (unsigned)
   -h      show this help
 
 Missing tools are installed automatically via Homebrew.
@@ -90,13 +95,14 @@ godot_version() {
 	}'
 }
 
+# ensure_export_templates <template file>, e.g. macos.zip or ios.zip
 ensure_export_templates() {
-	local version templates_dir number status tag url tmp
+	local required=$1 version templates_dir number status tag url tmp
 	version=$(godot_version)
 	[[ -n "$version" ]] || die "Could not detect the Godot version."
 	templates_dir="$HOME/Library/Application Support/Godot/export_templates/$version"
 
-	if [[ -f "$templates_dir/macos.zip" ]]; then
+	if [[ -f "$templates_dir/$required" ]]; then
 		return
 	fi
 
@@ -118,7 +124,7 @@ ensure_export_templates() {
 build_macos() {
 	log "macOS build (Godot)"
 	ensure_godot
-	ensure_export_templates
+	ensure_export_templates macos.zip
 
 	if [[ ! -d "$PROJECT_DIR/.godot" ]]; then
 		log "First run — importing project assets…"
@@ -160,6 +166,35 @@ build_amiga() {
 	ok "Amiga 500: $AMIGA_ADF"
 }
 
+# ---------------------------------------------------------------- iOS / iPadOS
+
+ensure_full_xcode() {
+	local developer_dir
+	developer_dir=$(xcode-select -p 2>/dev/null || true)
+	if [[ "$developer_dir" == *CommandLineTools* ]] || ! xcodebuild -version >/dev/null 2>&1; then
+		die "iOS builds need the full Xcode app (active developer dir: ${developer_dir:-none}). Install Xcode from the App Store, then run: sudo xcode-select -switch /Applications/Xcode.app"
+	fi
+}
+
+# build_ios <preset> <output path relative to ports/ios/project>
+build_ios() {
+	local preset=$1 output=$2
+	ensure_full_xcode
+	log "iOS build ($preset)"
+	ensure_godot
+	ensure_export_templates ios.zip
+
+	if [[ ! -d "$IOS_DIR/.godot" ]]; then
+		log "First run — importing iOS project assets…"
+		godot --headless --path "$IOS_DIR" --import
+	fi
+
+	mkdir -p "$IOS_DIR/$(dirname "$output")"
+	godot --headless --path "$IOS_DIR" --export-release "$preset" "$output"
+	[[ -e "$IOS_DIR/$output" ]] || die "Export failed — $IOS_DIR/$output is missing."
+	ok "iOS: $IOS_DIR/$output"
+}
+
 # ---------------------------------------------------------------- main
 
 clean() {
@@ -174,7 +209,7 @@ main() {
 	case "$target" in
 		-h|--help|help) usage; return ;;
 		clean) clean; return ;;
-		all|macos|amiga) ;;
+		all|macos|amiga|ios|ios-xcode) ;;
 		*) usage >&2; die "Unknown target: $target" ;;
 	esac
 
@@ -185,13 +220,20 @@ main() {
 	case "$target" in
 		macos) build_macos ;;
 		amiga) build_amiga ;;
+		ios)   build_ios "iOS" build/PHOBOS.ipa ;;
+		ios-xcode) build_ios "iOS Xcode" build/xcode/PHOBOS.xcodeproj ;;
 		all)   build_macos; build_amiga ;;
 	esac
 
 	printf '\n'
 	ok "Done."
-	[[ "$target" != amiga ]] && printf '   macOS:     %s\n' "$MACOS_APP"
-	[[ "$target" != macos ]] && printf '   Amiga 500: %s\n' "$AMIGA_ADF"
+	case "$target" in
+		macos) printf '   macOS:     %s\n' "$MACOS_APP" ;;
+		amiga) printf '   Amiga 500: %s\n' "$AMIGA_ADF" ;;
+		ios)   printf '   iOS:       %s\n' "$IOS_IPA" ;;
+		ios-xcode) printf '   iOS:       %s\n' "$IOS_XCODEPROJ" ;;
+		all)   printf '   macOS:     %s\n   Amiga 500: %s\n' "$MACOS_APP" "$AMIGA_ADF" ;;
+	esac
 	return 0
 }
 
