@@ -4,6 +4,7 @@ extends Node3D
 const MENU_ITEMS := ["play", "difficulty", "results"]
 const TouchControlsScript := preload("res://scripts/touch/touch_controls.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
+const AimAssist := preload("res://scripts/touch/aim_assist.gd")
 ## Orthographic camera height at the 16:9 design size; on narrower screens (iPad 4:3) the
 ## same horizontal extent is kept instead, so the whole arena always stays on screen.
 const CAMERA_HEIGHT := 27.5
@@ -92,6 +93,7 @@ func _ready() -> void:
 	add_child(hud)
 	touch_controls = TouchControlsScript.new()
 	touch_controls.source = self
+	touch_controls.aim_assist = _touch_aim_assist
 	add_child(touch_controls)
 	get_viewport().size_changed.connect(_on_viewport_resized)
 	_on_viewport_resized()
@@ -536,6 +538,15 @@ func _on_player_died() -> void:
 		_show_initials()
 	else:
 		_show_results(true)
+
+## Touch aim assist: bends the stick direction (arena x/z) towards the nearest-in-angle enemy.
+func _touch_aim_assist(dir: Vector2) -> Vector2:
+	var targets: Array = []
+	for enemy in enemy_pool:
+		if enemy.active:
+			targets.append(Vector2(enemy.global_position.x, enemy.global_position.z))
+	var origin := Vector2(player.global_position.x, player.global_position.z)
+	return AimAssist.pick(origin, dir, targets, TouchControlsScript.AIM_ASSIST_DEG)
 
 func _notification(what: int) -> void:
 	if what != NOTIFICATION_APPLICATION_PAUSED:

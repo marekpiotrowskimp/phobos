@@ -1,10 +1,14 @@
 extends RefCounted
 ## One floating on-screen stick: it appears where a finger lands inside `zone` and reports the
-## finger's offset from that point, scaled by `radius` and clamped to length 1.
+## finger's offset from that point as a vector of length 0…1.
+## Response: nothing inside `deadzone` px, then linear up to full output at `full_at` × `radius`.
+## If the finger goes further than `radius`, the origin follows it, so turning back reacts at once.
 ## Pure logic — no rendering and no Input actions.
 
 var zone := Rect2()
 var radius := 80.0
+var deadzone := 8.0
+var full_at := 0.6
 var touch_index := -1
 var origin := Vector2.ZERO
 var current := Vector2.ZERO
@@ -28,6 +32,9 @@ func drag(index: int, pos: Vector2) -> bool:
 	if index != touch_index or not is_active():
 		return false
 	current = pos
+	var offset := current - origin
+	if offset.length() > radius:
+		origin = current - offset.normalized() * radius
 	return true
 
 
@@ -45,6 +52,12 @@ func reset() -> void:
 
 
 func vector() -> Vector2:
-	if not is_active() or radius <= 0.0:
+	if not is_active():
 		return Vector2.ZERO
-	return ((current - origin) / radius).limit_length(1.0)
+	var offset := current - origin
+	var distance := offset.length()
+	var full := maxf(radius * full_at, deadzone + 0.001)
+	if distance <= deadzone:
+		return Vector2.ZERO
+	var strength := clampf((distance - deadzone) / (full - deadzone), 0.0, 1.0)
+	return offset / distance * strength

@@ -10,7 +10,13 @@ extends CanvasLayer
 const VirtualStick := preload("res://scripts/touch/virtual_stick.gd")
 
 const STICK_RADIUS := 80.0
-const FIRE_THRESHOLD := 0.35
+## Aim assist: the thumb's direction snaps to an enemy within ±AIM_ASSIST_DEG (touch only).
+const AIM_ASSIST_DEG := 15.0
+## Dead zones player.gd applies when it reads move_* / aim_* (Input.get_vector). The touch layer
+## pre-compensates them so the player sees exactly the stick's output, while pad input that
+## goes straight to player.gd keeps its own dead zones.
+const PLAYER_MOVE_DEADZONE := 0.28
+const PLAYER_AIM_DEADZONE := 0.35
 const BUTTON_SIZE := 96.0  # ≥ 88 px = 44 pt on the smallest landscape iPhone
 const MARGIN := 24.0
 const GAMEPAD_AXIS_THRESHOLD := 0.5
@@ -27,6 +33,8 @@ const COLOR_TEXT := Color(1, 1, 1, 0.8)
 var screen := "menu"
 var paused := true
 var source: Node = null
+## Optional: Callable(dir: Vector2) -> Vector2 that bends the aim towards a target (set by main).
+var aim_assist := Callable()
 
 var left_stick := VirtualStick.new()
 var right_stick := VirtualStick.new()
@@ -57,6 +65,8 @@ func _process(_delta: float) -> void:
 		paused = get_tree().paused
 	if not _sticks_enabled() and (left_stick.is_active() or right_stick.is_active()):
 		release_all()
+	elif right_stick.is_active():
+		_apply_sticks()  # targets move even when the thumb does not — keep the assisted aim fresh
 	_canvas.visible = _overlay_visible
 	_canvas.queue_redraw()
 
@@ -191,10 +201,24 @@ func _emit_action(action: String) -> void:
 # ------------------------------------------------------------------ actions
 
 func _apply_sticks() -> void:
-	_set_axis("move", left_stick.vector())
+	_set_axis("move", _compensate(left_stick.vector(), PLAYER_MOVE_DEADZONE))
 	var aim := right_stick.vector()
-	_set_axis("aim", aim)
-	_set_action("shoot", 1.0 if aim.length() >= FIRE_THRESHOLD else 0.0)
+	var strength := aim.length()
+	if strength > 0.0 and aim_assist.is_valid():
+		var assisted: Vector2 = aim_assist.call(aim)
+		if assisted.length_squared() > 0.0:
+			aim = assisted.normalized() * strength
+	_set_axis("aim", _compensate(aim, PLAYER_AIM_DEADZONE))
+	_set_action("shoot", 1.0 if strength > 0.0 else 0.0)
+
+
+## Scales a 0…1 stick vector so that after `deadzone` is removed again (Input.get_vector) the
+## reader gets the original length back.
+func _compensate(v: Vector2, deadzone: float) -> Vector2:
+	var length := v.length()
+	if length <= 0.0:
+		return Vector2.ZERO
+	return v / length * (deadzone + length * (1.0 - deadzone))
 
 
 func _set_axis(prefix: String, v: Vector2) -> void:
