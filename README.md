@@ -19,6 +19,17 @@ A twin-stick survival shooter made in **Godot**, with ports for the **Amiga 500*
 | Pause | START | Esc |
 | Restart | A | Enter / Space |
 
+## Quick build
+
+```sh
+./build.sh          # both platforms
+./build.sh macos    # project/build/PHOBOS.app
+./build.sh amiga    # ports/amiga500/build/PHOBOS-A500.adf
+./build.sh clean
+```
+
+The script installs any missing tools (Homebrew, Godot, export templates, uv, Brewfile dependencies, the m68k-amigaos toolchain).
+
 ## Running (development)
 
 ```sh
