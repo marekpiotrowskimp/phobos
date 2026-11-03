@@ -1,36 +1,36 @@
 # PHOBOS
 
-Twin-stick survival shooter inspirowany klasyką Alien Phobia (1997).
+A twin-stick survival shooter inspired by the classic Alien Phobia (1997).
 
-## Uruchomienie (dev)
+## Running (development)
 
 ```sh
 godot --path project --editor
 ```
 
-## Sterowanie
+## Controls
 
-| Akcja | Pad (DualSense) | Klawiatura |
-|-------|-----------------|------------|
-| Ruch | lewa gałka | WASD / strzałki |
-| Celowanie | prawa gałka | mysz |
-| Strzał | R2 (trzymaj) | LPM / Spacja |
-| Pauza | START | Esc |
-| Restart | A | Enter / Spacja |
+| Action | Gamepad (DualSense) | Keyboard |
+|--------|---------------------|----------|
+| Move | left stick | WASD / arrows |
+| Aim | right stick | mouse |
+| Fire | R2 (hold) | LMB / Space |
+| Pause | START | Esc |
+| Restart | A | Enter / Space |
 
-## Build macOS
+## macOS build
 
 ```sh
 cd project
 godot --headless --export-release "macOS" build/PHOBOS.app
 ```
 
-Jeśli Gatekeeper blokuje uruchomienie:
+If Gatekeeper blocks the app:
 
 ```sh
 xattr -dr com.apple.quarantine build/PHOBOS.app
 ```
 
-## Zasada projektu
+## Project rule
 
-Jeśli po tygodniu łapiesz się na tym, że odpalasz to dla przyjemności — projekt ma sens.
+If after a week you catch yourself launching it just for fun — the project makes sense.

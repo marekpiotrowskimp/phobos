@@ -1,18 +1,40 @@
 # PHOBOS
 
-Twin-stick survival shooter (Godot) z portami na **Amigę 500** i **Commodore 64**.
+A twin-stick survival shooter made in **Godot**, with ports for the **Amiga 500** and **Commodore 64**.
 
-| Katalog | Zawartość |
+| Directory | Contents |
 |---|---|
-| [`project/`](project/) | Wersja główna — Godot 4, macOS. Sterowanie i build: [project/README.md](project/README.md) |
-| [`ports/amiga500/`](ports/amiga500/) | Port na Amigę 500 (C, toolchain m68k-amigaos, `Makefile`, `toolchain.lock`) |
-| [`ports/commodore64/`](ports/commodore64/) | Dokumentacja portu na C64 |
-| [`docs/`](docs/) | Projekt gry |
+| [`project/`](project/) | Main version — Godot 4, macOS |
+| [`ports/amiga500/`](ports/amiga500/) | Amiga 500 port (C, m68k-amigaos toolchain, `Makefile`, `toolchain.lock`) |
+| [`ports/commodore64/`](ports/commodore64/) | C64 port documentation |
+| [`docs/`](docs/) | Game design |
 
-## Szybki start
+## Controls
+
+| Action | Gamepad (DualSense) | Keyboard |
+|---|---|---|
+| Move | left stick | WASD / arrows |
+| Aim | right stick | mouse |
+| Fire | R2 (hold) | LMB / Space |
+| Pause | START | Esc |
+| Restart | A | Enter / Space |
+
+## Running (development)
 
 ```sh
 godot --path project --editor
 ```
 
-Port Amigi: zależności w `ports/amiga500/Brewfile`, build `make -C ports/amiga500`.
+## macOS build
+
+```sh
+cd project
+godot --headless --export-release "macOS" build/PHOBOS.app
+xattr -dr com.apple.quarantine build/PHOBOS.app   # if Gatekeeper blocks the app
+```
+
+Amiga port: dependencies in `ports/amiga500/Brewfile`, build with `make -C ports/amiga500`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
