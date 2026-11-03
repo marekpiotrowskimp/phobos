@@ -175,7 +175,7 @@ func test_background_releases_touch(t) -> void:
 	await t.frames(2)
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_drag(0, Vector2(340, 400))
-	t.eq(0.5, snappedf(Input.get_action_strength("move_right"), 0.0001), "moving by touch")
+	t.approx_v(Vector2(0.8, 0.0), Input.get_vector("move_left", "move_right", "move_up", "move_down", 0.28), "moving by touch (40 px → 0.8 as player.gd reads it)", 0.01)
 	main.notification(Node.NOTIFICATION_APPLICATION_PAUSED)
 	await t.frames(2)
 	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("move"), "backgrounding releases held touch input")

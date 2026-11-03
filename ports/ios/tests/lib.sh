@@ -68,7 +68,9 @@ run_gd() {
 	out=$(HOME="$home" godot --headless --path "$IOS_PROJECT" -s "$ROOT/ports/ios/tests/gd/runner.gd" -- "$suite" "$name" 2>&1)
 	rc=$?
 	rm -rf "$home"
-	if [[ $rc -ne 0 ]] || ! grep -q "^GD_PASS $name\$" <<<"$out"; then
+	# A runtime error aborts the test function silently and the runner would still print
+	# GD_PASS — so any SCRIPT ERROR in the output is a failure too.
+	if [[ $rc -ne 0 ]] || ! grep -q "^GD_PASS $name\$" <<<"$out" || grep -q "SCRIPT ERROR" <<<"$out"; then
 		grep -E '^GD_ASSERT|SCRIPT ERROR|Parse Error|ERROR:' <<<"$out" | head -15 | sed 's/^/    /' >&2
 		return 1
 	fi

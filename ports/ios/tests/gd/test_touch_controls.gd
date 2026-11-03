@@ -1,9 +1,22 @@
 extends RefCounted
 # AC-2 … AC-6: TouchControls standalone (context set directly, no main scene).
+# Movement and aim are asserted as player.gd reads them (after its own dead zones).
 
 const VIEW := Rect2(0, 0, 1280, 720)
 const MIN_BUTTON := 88.0  # 44 pt on the smallest landscape iPhone at 1280x720 "keep" scaling
 const NAV_ACTIONS := ["menu_back", "menu_confirm", "menu_down", "menu_left", "menu_right", "menu_up"]
+## Dead zones player.gd applies when it reads the actions (Input.get_vector).
+const PLAYER_MOVE_DEADZONE := 0.28
+const PLAYER_AIM_DEADZONE := 0.35
+
+
+## What player.gd actually sees: the movement / aim vectors after its own dead zones.
+func _move() -> Vector2:
+	return Input.get_vector("move_left", "move_right", "move_up", "move_down", PLAYER_MOVE_DEADZONE)
+
+
+func _aim() -> Vector2:
+	return Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down", PLAYER_AIM_DEADZONE)
 
 
 func _check_button(t, name: String, r: Rect2) -> void:
@@ -35,50 +48,51 @@ func test_left_stick_moves(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
 	await t.touch_down(0, Vector2(300, 400))
-	await t.touch_drag(0, Vector2(340, 400))
-	t.eq({"left": 0.0, "right": 0.5, "up": 0.0, "down": 0.0}, t.strengths("move"), "40 px right → move_right 0.5")
+	await t.touch_drag(0, Vector2(306, 400))
+	t.approx_v(Vector2.ZERO, _move(), "6 px (inside the 8 px dead zone) → player does not move", 0.01)
+	await t.touch_drag(0, Vector2(328, 400))
+	t.approx_v(Vector2(0.5, 0.0), _move(), "28 px right → player moves right at half speed", 0.01)
+	await t.touch_drag(0, Vector2(348, 400))
+	t.approx_v(Vector2(1.0, 0.0), _move(), "48 px right → full speed", 0.01)
 	await t.touch_drag(0, Vector2(300, 460))
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.75}, t.strengths("move"), "60 px down → move_down 0.75")
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("aim"), "left stick never aims")
+	t.approx_v(Vector2(0.0, 1.0), _move(), "60 px down → full speed down", 0.01)
+	t.approx_v(Vector2.ZERO, _aim(), "left stick never aims", 0.01)
 	t.eq(false, Input.is_action_pressed("shoot"), "left stick never fires")
 	await t.touch_up(0, Vector2(300, 460))
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("move"), "release stops movement")
-
+	t.approx_v(Vector2.ZERO, _move(), "release stops movement", 0.001)
 
 func test_right_stick_aims_and_fires(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
 	await t.touch_down(0, Vector2(1000, 400))
-	await t.touch_drag(0, Vector2(1000, 370))
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.375, "down": 0.0}, t.strengths("aim"), "30 px up → aim_up 0.375")
-	t.eq(true, Input.is_action_pressed("shoot"), "deflection 0.375 ≥ 0.35 fires")
-	await t.touch_drag(0, Vector2(1000, 384))
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.2, "down": 0.0}, t.strengths("aim"), "16 px up → aim_up 0.2")
-	t.eq(false, Input.is_action_pressed("shoot"), "deflection 0.2 < 0.35 does not fire")
-	await t.touch_drag(0, Vector2(1060, 400))
-	t.eq({"left": 0.0, "right": 0.75, "up": 0.0, "down": 0.0}, t.strengths("aim"), "60 px right → aim_right 0.75")
-	t.eq(true, Input.is_action_pressed("shoot"), "fires again above threshold")
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("move"), "right stick never moves")
-	await t.touch_up(0, Vector2(1060, 400))
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("aim"), "release clears aim")
+	await t.touch_drag(0, Vector2(1000, 394))
+	t.eq(false, Input.is_action_pressed("shoot"), "6 px (dead zone) does not fire")
+	t.approx_v(Vector2.ZERO, _aim(), "6 px does not aim", 0.01)
+	await t.touch_drag(0, Vector2(1000, 388))
+	t.eq(true, Input.is_action_pressed("shoot"), "12 px already fires")
+	t.ok(_aim().length() > 0.05 and absf(_aim().angle_to(Vector2.UP)) < 0.02, "12 px up → player aims up (got %s)" % _aim())
+	await t.touch_drag(0, Vector2(1048, 400))
+	t.approx_v(Vector2(1.0, 0.0), _aim(), "48 px right → full aim right", 0.01)
+	t.eq(true, Input.is_action_pressed("shoot"), "fires while aiming")
+	t.approx_v(Vector2.ZERO, _move(), "right stick never moves", 0.01)
+	await t.touch_up(0, Vector2(1048, 400))
+	t.approx_v(Vector2.ZERO, _aim(), "release clears aim", 0.001)
 	t.eq(false, Input.is_action_pressed("shoot"), "release stops fire")
-
 
 func test_two_sticks_independent(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_down(1, Vector2(1000, 400))
-	await t.touch_drag(0, Vector2(340, 400))
-	await t.touch_drag(1, Vector2(1000, 440))
-	t.eq({"left": 0.0, "right": 0.5, "up": 0.0, "down": 0.0}, t.strengths("move"), "finger 0 moves right")
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.5}, t.strengths("aim"), "finger 1 aims down")
+	await t.touch_drag(0, Vector2(328, 400))
+	await t.touch_drag(1, Vector2(1000, 448))
+	t.approx_v(Vector2(0.5, 0.0), _move(), "finger 0 moves right at half speed", 0.01)
+	t.approx_v(Vector2(0.0, 1.0), _aim(), "finger 1 aims down", 0.01)
 	t.eq(true, Input.is_action_pressed("shoot"), "finger 1 fires")
-	await t.touch_up(0, Vector2(340, 400))
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("move"), "releasing finger 0 stops movement")
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.5}, t.strengths("aim"), "finger 1 keeps aiming")
+	await t.touch_up(0, Vector2(328, 400))
+	t.approx_v(Vector2.ZERO, _move(), "releasing finger 0 stops movement", 0.001)
+	t.approx_v(Vector2(0.0, 1.0), _aim(), "finger 1 keeps aiming", 0.01)
 	t.eq(true, Input.is_action_pressed("shoot"), "finger 1 keeps firing")
-
 
 func test_sticks_inactive_outside_gameplay(t) -> void:
 	var tc: Node = await t.spawn_touch("menu", true)
@@ -142,7 +156,7 @@ func test_pausing_releases_sticks(t) -> void:
 	if tc == null: return
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_drag(0, Vector2(340, 400))
-	t.eq(0.5, snappedf(Input.get_action_strength("move_right"), 0.0001), "moving before pause")
+	t.approx_v(Vector2(0.8, 0.0), _move(), "moving before pause (40 px → 0.8)", 0.01)
 	tc.paused = true
 	await t.frames(2)
-	t.eq({"left": 0.0, "right": 0.0, "up": 0.0, "down": 0.0}, t.strengths("move"), "pausing releases the held stick")
+	t.approx_v(Vector2.ZERO, _move(), "pausing releases the held stick", 0.001)

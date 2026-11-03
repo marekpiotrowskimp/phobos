@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 # Etap 02 — sterowanie dotykowe. Each function runs one GDScript test (tests/gd/*.gd) headless.
 
-# VirtualStick (AC-1)
+# VirtualStick (AC-1) — response curve and origin following: test_09_tuning.sh
 test_stick_press_in_zone_activates()        { run_gd test_virtual_stick.gd test_press_in_zone_activates; }
 test_stick_press_outside_zone_ignored()     { run_gd test_virtual_stick.gd test_press_outside_zone_ignored; }
-test_stick_drag_gives_scaled_vector()       { run_gd test_virtual_stick.gd test_drag_gives_scaled_vector; }
-test_stick_vector_clamped_to_unit_length()  { run_gd test_virtual_stick.gd test_vector_clamped_to_unit_length; }
 test_stick_second_finger_ignored()          { run_gd test_virtual_stick.gd test_second_finger_ignored; }
 test_stick_release_resets()                 { run_gd test_virtual_stick.gd test_release_resets; }
 
