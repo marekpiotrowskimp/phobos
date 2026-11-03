@@ -1,0 +1,16 @@
+.DS_Store
+**/.DS_Store
+project/.godot/
+project/build/
+project/*.dmg
+ports/*/.toolchain/
+ports/*/.venv/
+ports/*/build/
+ports/*/assets/generated/chip.bin
+ports/*/assets/generated/music.bin
+ports/*/assets/generated/preview/
+
+# sekrety / system
+.env
+secrets.h
+secrets.py

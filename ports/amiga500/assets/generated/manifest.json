@@ -1,0 +1,215 @@
+[
+  {
+    "name": "arena_floor",
+    "source": "project/assets/sprites/arena/arena_floor.svg",
+    "sha256": "f45c0a668739debba63dbc1ccbce3d915c393af1053c59268cdd5b2a1ad31d8b",
+    "size": [
+      320,
+      192
+    ],
+    "palette": "arena 0-9"
+  },
+  {
+    "name": "enemy_red_0",
+    "source": "project/assets/sprites/enemy/scorpion_crawl_1.png",
+    "sha256": "d46818429a889c856e803469aa2ef550ca382f0b26c4fd5fdc9c86b6bb0fc9c6",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_red_1",
+    "source": "project/assets/sprites/enemy/scorpion_crawl_2.png",
+    "sha256": "fbd2b7f2939253bcde72a73e2d40295cac81e2bf459ff87142e741eff30fc1e3",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_red_2",
+    "source": "project/assets/sprites/enemy/scorpion_crawl_3.png",
+    "sha256": "52a9d0c239578a3dff31b1f64b916f5bf49ddd47b817161fd7a517c9d6bf1f8a",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_red_3",
+    "source": "project/assets/sprites/enemy/scorpion_crawl_4.png",
+    "sha256": "380217b4aac78127bd0aa9b917795a18739ecfcc3b28bc780fbc18d70a8279c1",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_amber_0",
+    "source": "project/assets/sprites/enemy/scorpion_amber_1.png",
+    "sha256": "0136c3832d72543a643b8fbb8e8ce25ec44296e6ead4e5e660e2a34280da7613",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_amber_1",
+    "source": "project/assets/sprites/enemy/scorpion_amber_2.png",
+    "sha256": "b7413bbb48906a969255794310c7d31f14ae4a42f83e27730ba58207a51c8c1e",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_amber_2",
+    "source": "project/assets/sprites/enemy/scorpion_amber_3.png",
+    "sha256": "9e2f0b0091fdbe6267c81a8bac8741edfbb77e1dc79e8cac444108fcb032d026",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_amber_3",
+    "source": "project/assets/sprites/enemy/scorpion_amber_4.png",
+    "sha256": "3b5b14dff181c797b2bcb9eb54394c6e1deb78374ff1b30fdb326490fd68ba87",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_violet_0",
+    "source": "project/assets/sprites/enemy/scorpion_violet_1.png",
+    "sha256": "186aa208dedecc4f7dee33fe7b8b0fbb0613392868377199ef46c5174c9e002f",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_violet_1",
+    "source": "project/assets/sprites/enemy/scorpion_violet_2.png",
+    "sha256": "ee7e4dacb375991315a76ba4ca962cdd88743ea52a68211e3bdb4c0ce3ba799c",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_violet_2",
+    "source": "project/assets/sprites/enemy/scorpion_violet_3.png",
+    "sha256": "83016d0fbf6e424bac3d327e2307739b5525c54107c58b87376e8d4b9eea38e1",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "enemy_violet_3",
+    "source": "project/assets/sprites/enemy/scorpion_violet_4.png",
+    "sha256": "2ab957963551fcb929def4e76c2f564408db355a1885737adee68ff645d24b75",
+    "cell": 16,
+    "directions": 16
+  },
+  {
+    "name": "telegraph",
+    "source": "project/assets/sprites/effects/spawn_telegraph.svg",
+    "sha256": "132d8386798d28ecaf7a1d1a01c5268846cc6ff04b42e7d40ae7bfc835bb57d9",
+    "cell": 16,
+    "frames": 8
+  },
+  {
+    "name": "heal_nanocapsule",
+    "source": "project/assets/sprites/pickups/heal_nanocapsule.svg",
+    "sha256": "7f5fd9af3b38b6c57a692ef6827ccf28bd096ddd050b67921c94af5af5693538",
+    "cell": 16,
+    "frames": 8
+  },
+  {
+    "name": "overdrive_reactor",
+    "source": "project/assets/sprites/pickups/overdrive_reactor.svg",
+    "sha256": "c4b207b60a8e76e13e8f76cacfc1170c872250af6747d7186bc1e4f115c7fa11",
+    "cell": 16,
+    "frames": 8
+  },
+  {
+    "name": "player_0",
+    "source": "project/assets/sprites/player/player_move_1.png",
+    "sha256": "f63df94a670c4413a7d18b15710c74661c03eeb0a30e0a253bcdd3a88e4299b2",
+    "cell": 32,
+    "directions": 16
+  },
+  {
+    "name": "player_1",
+    "source": "project/assets/sprites/player/player_move_2.png",
+    "sha256": "a441ffc8a211523ea83044d09823591a399ce3fb77f7accf94a119e32b08e8a7",
+    "cell": 32,
+    "directions": 16
+  },
+  {
+    "name": "player_2",
+    "source": "project/assets/sprites/player/player_move_3.png",
+    "sha256": "e37bf5da5ad26141ccf3396fcd1cda7069cc9ee667d646b60b54ff55e9c58d35",
+    "cell": 32,
+    "directions": 16
+  },
+  {
+    "name": "player_3",
+    "source": "project/assets/sprites/player/player_move_4.png",
+    "sha256": "403f51a874a989836e31d01c2adb071b27b165a80d11251f477209541340b81c",
+    "cell": 32,
+    "directions": 16
+  },
+  {
+    "name": "font_xl",
+    "source": "project/assets/fonts/Tektur-Variable.ttf",
+    "sha256": "a4c451e5336874811267c2a514efa09bca7bc8cabf32a310f0b44e111eacb933",
+    "size": 22,
+    "weight": 760
+  },
+  {
+    "name": "font_l",
+    "source": "project/assets/fonts/Tektur-Variable.ttf",
+    "sha256": "a4c451e5336874811267c2a514efa09bca7bc8cabf32a310f0b44e111eacb933",
+    "size": 16,
+    "weight": 760
+  },
+  {
+    "name": "font_s",
+    "source": "project/assets/fonts/Oxanium-Variable.ttf",
+    "sha256": "2ce01d946e1e1ffc8d7eecfffbda8623bedd63eaf811a20488c4b69af45babb0",
+    "size": 9,
+    "weight": 600
+  },
+  {
+    "name": "sfx",
+    "rate": 11025,
+    "format": "s8 PCM",
+    "sounds": [
+      "shot",
+      "hit",
+      "enemy_die",
+      "player_damage",
+      "pickup_heal",
+      "pickup_overdrive",
+      "overdrive_off",
+      "wave_start",
+      "wave_clear",
+      "game_over"
+    ]
+  },
+  {
+    "name": "music",
+    "rate": 8000,
+    "format": "s8 PCM",
+    "layers": 4,
+    "layer_bytes": 32000
+  },
+  {
+    "name": "gfx.lz",
+    "bytes": 57705,
+    "format": "LZSS 12/4"
+  },
+  {
+    "name": "sfx.raw",
+    "bytes": 57778,
+    "format": "s8 PCM"
+  },
+  {
+    "name": "music.ima",
+    "bytes": 64000,
+    "format": "IMA ADPCM 4-bit"
+  },
+  {
+    "name": "chip.bin",
+    "bytes": 210898,
+    "sha256": "d31df723fa1bf989aef7c89b7b35ae5fbd374a32eff3f4c137b10e43dc3865bb"
+  },
+  {
+    "name": "music.bin",
+    "bytes": 128000,
+    "sha256": "71a7c5856b60a0a256b8b1f8f4ad575759f63b1cb476f5b238e141200582305b"
+  }
+]

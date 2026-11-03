@@ -1,0 +1,129 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/concept_preview.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/concepts/player_aegis.svg" id="2_player"]
+[ext_resource type="Texture2D" path="res://assets/sprites/concepts/enemy_scorpion.svg" id="3_scorpion"]
+
+[sub_resource type="StandardMaterial3D" id="DarkMaterial"]
+shading_mode = 0
+albedo_color = Color(0.012, 0.018, 0.025, 1)
+
+[sub_resource type="PlaneMesh" id="DarkPlane"]
+material = SubResource("DarkMaterial")
+size = Vector2(20, 24)
+
+[sub_resource type="StandardMaterial3D" id="LightMaterial"]
+shading_mode = 0
+albedo_color = Color(0.72, 0.75, 0.74, 1)
+
+[sub_resource type="PlaneMesh" id="LightPlane"]
+material = SubResource("LightMaterial")
+size = Vector2(20, 24)
+
+[node name="ConceptPreview" type="Node3D"]
+script = ExtResource("1_script")
+
+[node name="DarkFloor" type="MeshInstance3D" parent="."]
+position = Vector3(-10, 0, 0)
+mesh = SubResource("DarkPlane")
+
+[node name="LightFloor" type="MeshInstance3D" parent="."]
+position = Vector3(10, 0, 0)
+mesh = SubResource("LightPlane")
+
+[node name="PlayerDarkLarge" type="Sprite3D" parent="."]
+position = Vector3(-15, 0.08, -2.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("2_player")
+pixel_size = 0.009
+
+[node name="ScorpionDarkLarge" type="Sprite3D" parent="."]
+position = Vector3(-5, 0.08, -2.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("3_scorpion")
+pixel_size = 0.009
+
+[node name="PlayerLightLarge" type="Sprite3D" parent="."]
+position = Vector3(5, 0.08, -2.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("2_player")
+pixel_size = 0.009
+
+[node name="ScorpionLightLarge" type="Sprite3D" parent="."]
+position = Vector3(15, 0.08, -2.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("3_scorpion")
+pixel_size = 0.009
+
+[node name="PlayerDarkGameSize" type="Sprite3D" parent="."]
+position = Vector3(-13, 0.08, 5.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("2_player")
+pixel_size = 0.0045
+
+[node name="ScorpionDarkGameSize" type="Sprite3D" parent="."]
+position = Vector3(-7, 0.08, 5.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("3_scorpion")
+pixel_size = 0.0039
+
+[node name="PlayerLightGameSize" type="Sprite3D" parent="."]
+position = Vector3(7, 0.08, 5.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("2_player")
+pixel_size = 0.0045
+
+[node name="ScorpionLightGameSize" type="Sprite3D" parent="."]
+position = Vector3(13, 0.08, 5.5)
+rotation_degrees = Vector3(-90, 0, 0)
+texture = ExtResource("3_scorpion")
+pixel_size = 0.0039
+
+[node name="Camera" type="Camera3D" parent="."]
+position = Vector3(0, 34, 0)
+rotation_degrees = Vector3(-90, 0, 0)
+projection = 1
+size = 27.5
+current = true
+
+[node name="Labels" type="CanvasLayer" parent="."]
+
+[node name="Title" type="Label" parent="Labels"]
+offset_left = 20.0
+offset_top = 14.0
+offset_right = 1260.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.78, 0.94, 0.96, 1)
+theme_override_font_sizes/font_size = 30
+text = "PHOBOS / BIO-INDUSTRIAL HORROR / CONCEPT 01"
+horizontal_alignment = 1
+
+[node name="DarkLabel" type="Label" parent="Labels"]
+offset_left = 30.0
+offset_top = 62.0
+offset_right = 620.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0.35, 0.82, 0.88, 1)
+theme_override_font_sizes/font_size = 20
+text = "DARK ARENA"
+horizontal_alignment = 1
+
+[node name="LightLabel" type="Label" parent="Labels"]
+offset_left = 660.0
+offset_top = 62.0
+offset_right = 1250.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0.12, 0.19, 0.21, 1)
+theme_override_font_sizes/font_size = 20
+text = "LIGHT SILHOUETTE TEST"
+horizontal_alignment = 1
+
+[node name="ScaleLabel" type="Label" parent="Labels"]
+offset_left = 30.0
+offset_top = 610.0
+offset_right = 1250.0
+offset_bottom = 648.0
+theme_override_colors/font_color = Color(0.55, 0.64, 0.67, 1)
+theme_override_font_sizes/font_size = 18
+text = "GAMEPLAY SCALE: PLAYER ~60 PX / SCORPION ~55 PX"
+horizontal_alignment = 1

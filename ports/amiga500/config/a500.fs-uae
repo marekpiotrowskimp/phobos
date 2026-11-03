@@ -1,0 +1,8 @@
+[fs-uae]
+amiga_model = A500
+accuracy = 1
+automatic_input_grab = 0
+floppy_drive_count = 1
+fullscreen = 0
+window_width = 960
+window_height = 720
