@@ -49,6 +49,13 @@ var _pause_label: Label
 var _display_font: FontVariation
 var _ui_font: FontVariation
 var _ui_font_bold: FontVariation
+## Gameplay HUD controls and their offsets without safe-area margins.
+var _safe_controls: Array[Control] = []
+var _base_offsets := {}
+
+## Width of the menu-screen text column: wide enough for the longest ranking line (≈ 610 px at
+## 22 px) and narrow enough to stay between the touch d-pad and the OK/BACK buttons.
+const SCREEN_COLUMN_WIDTH := 640.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -116,7 +123,7 @@ func _build_hud() -> void:
 	add_child(score_label)
 
 	kills_label = Label.new()
-	kills_label.add_theme_font_size_override("font_size", 20)
+	kills_label.add_theme_font_size_override("font_size", 22)
 	kills_label.text = "Zabicia: 0"
 	kills_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	kills_label.position = Vector2(-300, 22)
@@ -131,7 +138,7 @@ func _build_hud() -> void:
 	add_child(fps_label)
 
 	difficulty_label = Label.new()
-	difficulty_label.add_theme_font_size_override("font_size", 18)
+	difficulty_label.add_theme_font_size_override("font_size", 22)
 	difficulty_label.position = Vector2(24, 22)
 	difficulty_label.size = Vector2(300, 28)
 	add_child(difficulty_label)
@@ -176,6 +183,10 @@ func _build_hud() -> void:
 	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(flash)
 
+	_safe_controls = [wave_label, score_label, kills_label, fps_label, difficulty_label, hp_bar, od_bar]
+	for control in _safe_controls:
+		_base_offsets[control] = [control.offset_left, control.offset_top, control.offset_right, control.offset_bottom]
+
 func _build_panels() -> void:
 	pause_panel = ColorRect.new()
 	pause_panel.color = Color(0, 0, 0, 0.6)
@@ -184,7 +195,7 @@ func _build_panels() -> void:
 	pause_panel.visible = false
 	add_child(pause_panel)
 	_pause_label = Label.new()
-	_pause_label.text = "PAUZA\nESC — wznów"
+	_pause_label.text = "PAUZA\nII — WZNÓW"
 	_pause_label.add_theme_font_size_override("font_size", 48)
 	_pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_pause_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -227,7 +238,7 @@ func _build_panels() -> void:
 	_go_stats.position = Vector2(-400, 40)
 	_go_stats.size = Vector2(800, 40)
 	game_over_panel.add_child(_go_stats)
-	_go_hint.text = "ENTER / PAD A — GRAJ PONOWNIE"
+	_go_hint.text = "OK — GRAJ PONOWNIE"
 	_go_hint.add_theme_font_size_override("font_size", 26)
 	_go_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_go_hint.set_anchors_preset(Control.PRESET_CENTER)
@@ -245,25 +256,54 @@ func _build_panels() -> void:
 	_screen_title = Label.new()
 	_screen_title.add_theme_font_size_override("font_size", 64)
 	_screen_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_screen_title.position = Vector2(120, 45)
-	_screen_title.size = Vector2(1040, 90)
+	_center_in_screen(_screen_title, -315.0, 90.0)
 	_screen_title.add_theme_color_override("font_color", Color(0.45, 0.9, 1.0))
 	screen_panel.add_child(_screen_title)
 	_screen_body = Label.new()
 	_screen_body.add_theme_font_size_override("font_size", 22)
 	_screen_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_screen_body.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_screen_body.position = Vector2(100, 135)
-	_screen_body.size = Vector2(1080, 440)
+	_center_in_screen(_screen_body, -225.0, 440.0)
 	_screen_body.add_theme_color_override("font_color", Color(0.84, 0.9, 0.94))
 	screen_panel.add_child(_screen_body)
 	_screen_hint = Label.new()
-	_screen_hint.add_theme_font_size_override("font_size", 19)
+	_screen_hint.add_theme_font_size_override("font_size", 22)
 	_screen_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_screen_hint.position = Vector2(100, 625)
-	_screen_hint.size = Vector2(1080, 38)
+	_center_in_screen(_screen_hint, 265.0, 38.0)
 	_screen_hint.add_theme_color_override("font_color", Color(0.42, 0.72, 0.82))
 	screen_panel.add_child(_screen_hint)
+
+## Anchors a menu-screen label to the screen centre: SCREEN_COLUMN_WIDTH wide, `height` tall,
+## its top edge `top` px from the vertical centre (the 1280x720 layout kept, but centred).
+func _center_in_screen(label: Label, top: float, height: float) -> void:
+	label.anchor_left = 0.5
+	label.anchor_right = 0.5
+	label.anchor_top = 0.5
+	label.anchor_bottom = 0.5
+	label.offset_left = -SCREEN_COLUMN_WIDTH / 2.0
+	label.offset_right = SCREEN_COLUMN_WIDTH / 2.0
+	label.offset_top = top
+	label.offset_bottom = top + height
+
+## Moves the gameplay HUD inside the safe area: controls anchored to an edge keep their inset
+## from that edge of the safe area. margins = {left, top, right, bottom} in canvas pixels.
+func apply_safe_margins(margins: Dictionary) -> void:
+	for control in _safe_controls:
+		var base: Array = _base_offsets[control]
+		var dx := 0.0
+		if control.anchor_left == 0.0 and control.anchor_right == 0.0:
+			dx = float(margins.get("left", 0.0))
+		elif control.anchor_left == 1.0 and control.anchor_right == 1.0:
+			dx = -float(margins.get("right", 0.0))
+		var dy := 0.0
+		if control.anchor_top == 0.0 and control.anchor_bottom == 0.0:
+			dy = float(margins.get("top", 0.0))
+		elif control.anchor_top == 1.0 and control.anchor_bottom == 1.0:
+			dy = -float(margins.get("bottom", 0.0))
+		control.offset_left = base[0] + dx
+		control.offset_top = base[1] + dy
+		control.offset_right = base[2] + dx
+		control.offset_bottom = base[3] + dy
 
 func reset() -> void:
 	set_hp(Balance.player_max_hp, Balance.player_max_hp)
@@ -310,11 +350,11 @@ func show_gameplay(difficulty: String) -> void:
 	set_gameplay_visible(true)
 
 func show_main_menu(selected: int, difficulty: String) -> void:
-	var entries := ["GRAJ", "TRUDNOŚĆ: < %s >" % difficulty, "WYNIKI", "WYJŚCIE"]
+	var entries := ["GRAJ", "TRUDNOŚĆ: < %s >" % difficulty, "WYNIKI"]
 	var lines := PackedStringArray()
 	for i in entries.size():
 		lines.append((">  %s  <" if i == selected else "   %s   ") % entries[i])
-	_show_screen("PHOBOS", "\n".join(lines), "STRZAŁKI / LEWA GAŁKA  •  ENTER / PAD A")
+	_show_screen("PHOBOS", "\n".join(lines), "▲▼ WYBÓR  •  OK")
 
 func show_initials(chars: PackedStringArray, cursor: int, result: Dictionary, difficulty: String) -> void:
 	var displayed := PackedStringArray()
@@ -324,7 +364,7 @@ func show_initials(chars: PackedStringArray, cursor: int, result: Dictionary, di
 		int(result.get("score", 0)), difficulty, int(result.get("wave", 0)),
 		int(result.get("kills", 0)), "   ".join(displayed)
 	]
-	_show_screen("WPISZ INICJAŁY", body, "GÓRA/DÓŁ: LITERA  •  LEWO/PRAWO: POZYCJA  •  ENTER / PAD A")
+	_show_screen("WPISZ INICJAŁY", body, "▲▼ LITERA  •  ◀▶ POZYCJA  •  OK")
 
 func show_results(entries: Array, filter_label: String, summary: Dictionary, from_run: bool) -> void:
 	var lines := PackedStringArray()
@@ -348,7 +388,7 @@ func show_results(entries: Array, filter_label: String, summary: Dictionary, fro
 		])
 	if count == 0:
 		lines.append("\nBRAK ZAPISANYCH WYNIKÓW")
-	var hint := "LEWO/PRAWO: FILTR  •  ENTER / PAD A: JESZCZE RAZ  •  ESC / PAD B: MENU" if from_run else "LEWO/PRAWO: FILTR  •  ENTER / ESC / PAD A/B: MENU"
+	var hint := "◀▶ FILTR  •  OK JESZCZE RAZ  •  WSTECZ MENU" if from_run else "◀▶ FILTR  •  OK / WSTECZ MENU"
 	_show_screen("WYNIKI", "\n".join(lines), hint)
 
 func set_gameplay_visible(on: bool) -> void:

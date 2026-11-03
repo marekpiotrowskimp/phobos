@@ -1,10 +1,18 @@
 extends Node3D
 
-const MENU_ITEMS := ["play", "difficulty", "results", "quit"]
+# iOS: no "quit" item — apps must not terminate themselves (App Store guidelines).
+const MENU_ITEMS := ["play", "difficulty", "results"]
+const TouchControlsScript := preload("res://scripts/touch/touch_controls.gd")
+const SafeArea := preload("res://scripts/ui/safe_area.gd")
+## Orthographic camera height at the 16:9 design size; on narrower screens (iPad 4:3) the
+## same horizontal extent is kept instead, so the whole arena always stays on screen.
+const CAMERA_HEIGHT := 27.5
+const DESIGN_ASPECT := 1280.0 / 720.0
 const RESULT_FILTERS := ["all", "easy", "normal", "hard"]
 
 var player: Player
 var hud: Hud
+var touch_controls: Node
 var camera: Camera3D
 var world_environment: Environment
 
@@ -82,6 +90,11 @@ func _ready() -> void:
 	_build_camera()
 	hud = Hud.new()
 	add_child(hud)
+	touch_controls = TouchControlsScript.new()
+	touch_controls.source = self
+	add_child(touch_controls)
+	get_viewport().size_changed.connect(_on_viewport_resized)
+	_on_viewport_resized()
 	player = Player.new()
 	player.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(player)
@@ -524,6 +537,16 @@ func _on_player_died() -> void:
 	else:
 		_show_results(true)
 
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_APPLICATION_PAUSED:
+		return
+	# iOS: the app went to the background — drop held touches and pause a running round.
+	if touch_controls != null:
+		touch_controls.release_all()
+	if screen == "game" and state != "over" and not get_tree().paused:
+		get_tree().paused = true
+		hud.toggle_pause(true)
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("mute"):
 		AudioServer.set_bus_mute(0, not AudioServer.is_bus_mute(0))
@@ -567,8 +590,6 @@ func _handle_menu_input(event: InputEvent) -> void:
 			"results":
 				_results_filter_index = 0
 				_show_results(false)
-			"quit":
-				get_tree().quit()
 		return
 	hud.show_main_menu(_menu_index, _difficulty_label(GameState.selected_difficulty))
 
@@ -851,10 +872,29 @@ func _update_shake(delta: float) -> void:
 	camera.position.y = 34.0
 	camera.position.z = _rng.randf_range(-1.0, 1.0) * k
 
+func _fit_camera() -> void:
+	var visible := get_viewport().get_visible_rect().size
+	if visible.y <= 0.0 or visible.x / visible.y >= DESIGN_ASPECT:
+		camera.keep_aspect = Camera3D.KEEP_HEIGHT
+		camera.size = CAMERA_HEIGHT
+	else:
+		camera.keep_aspect = Camera3D.KEEP_WIDTH
+		camera.size = CAMERA_HEIGHT * DESIGN_ASPECT
+
+func _on_viewport_resized() -> void:
+	_fit_camera()
+	apply_safe_area(DisplayServer.get_display_safe_area(), DisplayServer.window_get_size())
+
+## Lays HUD and touch controls out inside the device safe area (notch, home indicator).
+func apply_safe_area(safe_rect: Rect2i, window_size: Vector2i) -> void:
+	var margins := SafeArea.margins(safe_rect, window_size, get_viewport().get_visible_rect().size)
+	hud.apply_safe_margins(margins)
+	touch_controls.set_safe_margins(margins)
+
 func _build_camera() -> void:
 	camera = Camera3D.new()
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 27.5
+	camera.size = CAMERA_HEIGHT
 	camera.position = Vector3(0, 34, 0)
 	camera.rotation_degrees = Vector3(-90, 0, 0)
 	camera.near = 1.0
