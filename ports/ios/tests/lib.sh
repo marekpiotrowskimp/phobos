@@ -56,4 +56,22 @@ print("<missing>")
 EOF
 }
 
+# run_gd <suite file in tests/gd> <test function>
+# Runs one GDScript test headless in the iOS project. HOME points to a throwaway directory so
+# the game never touches the real user data (app_userdata/PHOBOS is shared with macOS).
+run_gd() {
+	local suite="$ROOT/ports/ios/tests/gd/$1" name=$2 home out rc
+	home=$(mktemp -d)
+	if [[ ! -d "$IOS_PROJECT/.godot" ]]; then
+		HOME="$home" godot --headless --path "$IOS_PROJECT" --import >/dev/null 2>&1
+	fi
+	out=$(HOME="$home" godot --headless --path "$IOS_PROJECT" -s "$ROOT/ports/ios/tests/gd/runner.gd" -- "$suite" "$name" 2>&1)
+	rc=$?
+	rm -rf "$home"
+	if [[ $rc -ne 0 ]] || ! grep -q "^GD_PASS $name\$" <<<"$out"; then
+		grep -E '^GD_ASSERT|SCRIPT ERROR|Parse Error|ERROR:' <<<"$out" | head -15 | sed 's/^/    /' >&2
+		return 1
+	fi
+}
+
 baseline_commit() { { tr -d '[:space:]' < "$IOS_DIR/BASELINE"; } 2>/dev/null; }
