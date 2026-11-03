@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# AC-1, AC-2 (etap 01) + zmiany dozwolone w etapach 02–03:
+# AC-1, AC-2 (etap 01) + zmiany dozwolone w etapach 02–03 i poprawkach:
 # ports/ios/project is a copy of project/ at the BASELINE commit; only the files listed
-# below may differ and only new files under scripts/touch/ and scripts/ui/ may be added.
+# below may differ; new files only under scripts/touch/, scripts/ui/ and the iOS app icon.
 
 # Files allowed to differ from the macOS original.
 ALLOWED_DIFF=(project.godot export_presets.cfg scripts/main.gd scripts/hud.gd)
 # New iOS-only files (paths relative to the iOS project) must match this pattern.
-NEW_FILES_PATTERN='^scripts/(touch|ui)/[a-z_]+\.gd(\.uid)?$'
+NEW_FILES_PATTERN='^(scripts/(touch|ui)/[a-z_]+\.gd(\.uid)?|assets/ios/app_icon_1024\.png(\.import)?)$'
 
 test_baseline_is_existing_commit() {
 	assert_file "$IOS_DIR/BASELINE" || return 1
@@ -26,7 +26,7 @@ test_copy_has_same_file_set() {
 	missing=$(comm -23 <(echo "$expected") <(echo "$actual"))
 	extra=$(comm -13 <(echo "$expected") <(echo "$actual") | grep -Ev "$NEW_FILES_PATTERN")
 	assert_eq "" "$missing" "files of project/ at BASELINE missing from the iOS copy" || return 1
-	assert_eq "" "$extra" "unexpected new files (only scripts/touch/*.gd and scripts/ui/*.gd allowed)"
+	assert_eq "" "$extra" "unexpected new files (only scripts/touch/*.gd, scripts/ui/*.gd and assets/ios/app_icon_1024.png allowed)"
 }
 
 test_copy_files_identical() {
@@ -50,10 +50,10 @@ test_project_godot_only_ios_settings() {
 	assert_file "$IOS_PROJECT/project.godot" || return 1
 	local removed added
 	removed=$(diff <(git -C "$ROOT" show "$base:project/project.godot") "$IOS_PROJECT/project.godot" | grep -E '^<')
-	added=$(diff <(git -C "$ROOT" show "$base:project/project.godot") "$IOS_PROJECT/project.godot" | grep -E '^>' | grep -Ev '^> *$' | sort)
+	added=$(diff <(git -C "$ROOT" show "$base:project/project.godot") "$IOS_PROJECT/project.godot" | grep -E '^>' | grep -Ev '^> *$' | LC_ALL=C sort)
 	# the only original line that may change: stretch aspect keep → expand (etap 03)
 	assert_eq '< window/stretch/aspect="keep"' "$removed" "project.godot: only the stretch aspect line of the original may change" || return 1
-	assert_eq $'> [input_devices]\n> pointing/emulate_mouse_from_touch=false\n> window/handheld/orientation=4\n> window/stretch/aspect="expand"' "$added" "project.godot: only the iOS settings are added" || return 1
+	assert_eq $'> [audio]\n> [input_devices]\n> general/ios/session_category=0\n> pointing/emulate_mouse_from_touch=false\n> window/handheld/orientation=4\n> window/stretch/aspect="expand"' "$added" "project.godot: only the iOS settings are added" || return 1
 	local section
 	section=$(awk '/^\[/{s=$0} /^window\/handheld\/orientation=/{print s}' "$IOS_PROJECT/project.godot")
 	assert_eq "[display]" "$section" "orientation line is in [display]" || return 1
