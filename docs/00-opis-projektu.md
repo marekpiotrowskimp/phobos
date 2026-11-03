@@ -70,6 +70,9 @@ Zatwierdzenie planu nie oznacza automatycznej zgody na realizację wszystkich et
 
 - Kontynuacja projektu w Godot z platformą docelową macOS.
 - Port PS5 został świadomie porzucony; projekt nie zakłada SDK Sony, devkitu ani certyfikacji konsolowej.
+  Decyzja z 2026-11-03: PS5 wraca jako opcja warunkowa (Godot + W4 Consoles, po akceptacji Sony),
+  patrz `ports/ios/docs/00-zalozenia-licencje-i-platformy.md`.
+- Planowany port iOS / iPadOS (App Store): `ports/ios/docs/`.
 - Osobne porty retro powstają kolejno na Amigę 500, a po jej akceptacji na Commodore 64.
 - Prototyp = specyfikacja: zachowujemy modele, dźwięk, parametry balansu i wiedzę.
 
