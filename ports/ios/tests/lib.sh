@@ -6,7 +6,11 @@ IOS_DIR="$ROOT/ports/ios"
 IOS_PROJECT="$IOS_DIR/project"
 IOS_PRESETS="$IOS_PROJECT/export_presets.cfg"
 MACOS_PRESETS="$ROOT/project/export_presets.cfg"
-XCODE_EXPORT="$IOS_PROJECT/build/xcode"
+# Tests export the Xcode project to a scratch directory (build.sh honours PHOBOS_IOS_XCODE_DIR),
+# never to ports/ios/project/build/xcode — that one is the user's working project in Xcode.
+USER_XCODE_DIR="$IOS_PROJECT/build/xcode"
+XCODE_EXPORT="${TMPDIR:-/tmp}/phobos-ios-tests/xcode"
+export PHOBOS_IOS_XCODE_DIR="$XCODE_EXPORT"
 
 SKIP=77
 
