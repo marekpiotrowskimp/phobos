@@ -20,10 +20,20 @@ const BUTTON_SIZE := 96.0  # ≥ 88 px = 44 pt on the smallest landscape iPhone
 const MARGIN := 24.0
 const GAMEPAD_AXIS_THRESHOLD := 0.5
 const GAMEPLAY_SCREEN := "game"
-const NAV_LABELS := {
-	"menu_up": "▲", "menu_down": "▼", "menu_left": "◀", "menu_right": "▶",
-	"menu_confirm": "OK", "menu_back": "WSTECZ",
+const Localization := preload("res://scripts/ui/localization.gd")
+## Text buttons and their Localization keys; every other button is a drawn icon (button_icon),
+## because the game fonts have no ▲▼◀▶♪ glyphs.
+const TEXT_BUTTONS := {"menu_confirm": "button_ok", "menu_back": "button_back"}
+const ICON_BUTTONS := {
+	"menu_up": "arrow_up", "menu_down": "arrow_down", "menu_left": "arrow_left",
+	"menu_right": "arrow_right", "pause": "pause",
 }
+const BUTTON_FONT_FILE := preload("res://assets/fonts/Oxanium-Variable.ttf")
+const BUTTON_FONT_WEIGHT := 600.0
+const BUTTON_FONT_SIZE := 28
+const BUTTON_FONT_MIN_SIZE := 20
+## Horizontal room for a label inside a button (4 px padding on each side).
+const BUTTON_TEXT_ROOM := BUTTON_SIZE - 8.0
 const COLOR_BASE := Color(1, 1, 1, 0.12)
 const COLOR_KNOB := Color(1, 1, 1, 0.35)
 const COLOR_BUTTON := Color(1, 1, 1, 0.16)
@@ -43,6 +53,7 @@ var _overlay_visible := true
 var _safe := {"left": 0.0, "top": 0.0, "right": 0.0, "bottom": 0.0}
 var _owned_actions := {}
 var _canvas: Control
+var _button_font: FontVariation
 
 
 func _ready() -> void:
@@ -251,16 +262,19 @@ func release_all() -> void:
 # ------------------------------------------------------------------ drawing
 
 func _draw_overlay() -> void:
-	var font := ThemeDB.fallback_font
+	var font := button_font()
 	var buttons := _active_buttons()
 	for action in buttons:
 		var r: Rect2 = buttons[action]
 		_canvas.draw_rect(r, COLOR_BUTTON)
-		var label: String = NAV_LABELS.get(action, "II" if action == "pause" else "♪")
-		if action == "mute" and AudioServer.is_bus_mute(0):
-			label = "♪×"
-		_canvas.draw_string(font, Vector2(r.position.x, r.get_center().y + 10), label,
-			HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 28, COLOR_TEXT)
+		var icon := button_icon(action)
+		if icon != "":
+			_draw_icon(icon, r)
+			continue
+		var size := button_font_size(action)
+		var baseline := r.get_center().y + (font.get_ascent(size) - font.get_descent(size)) * 0.5
+		_canvas.draw_string(font, Vector2(r.position.x, baseline), button_label(action),
+			HORIZONTAL_ALIGNMENT_CENTER, r.size.x, size, COLOR_TEXT)
 	for stick in [left_stick, right_stick]:
 		if stick.is_active():
 			_canvas.draw_circle(stick.origin, stick.radius, COLOR_BASE)
@@ -272,3 +286,71 @@ func knob_position(stick) -> Vector2:
 	if not stick.is_active():
 		return Vector2.ZERO
 	return stick.origin + (stick.current - stick.origin).limit_length(stick.radius)
+
+
+# ------------------------------------------------------------ button content
+
+## Text shown on a button in the current language; "" for icon buttons.
+func button_label(action: String) -> String:
+	if TEXT_BUTTONS.has(action):
+		return Localization.t(TEXT_BUTTONS[action])
+	return ""
+
+
+## Drawn icon of a button: arrow_up/down/left/right, pause, sound_on/sound_off; "" for text.
+func button_icon(action: String) -> String:
+	if action == "mute":
+		return "sound_off" if AudioServer.is_bus_mute(0) else "sound_on"
+	return str(ICON_BUTTONS.get(action, ""))
+
+
+## The game UI font (Oxanium, semi-bold) — the variable font would otherwise render its thinnest weight.
+func button_font() -> Font:
+	if _button_font == null:
+		_button_font = FontVariation.new()
+		_button_font.base_font = BUTTON_FONT_FILE
+		var text_server := TextServerManager.get_primary_interface()
+		_button_font.variation_opentype = {text_server.name_to_tag("wght"): BUTTON_FONT_WEIGHT}
+	return _button_font
+
+
+## BUTTON_FONT_SIZE, reduced (down to BUTTON_FONT_MIN_SIZE) until the label fits the button.
+func button_font_size(action: String) -> int:
+	var label := button_label(action)
+	var font := button_font()
+	var size := BUTTON_FONT_SIZE
+	while size > BUTTON_FONT_MIN_SIZE and font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, size).x > BUTTON_TEXT_ROOM:
+		size -= 1
+	return size
+
+
+func _draw_icon(icon: String, r: Rect2) -> void:
+	var c := r.get_center()
+	var s := r.size.x * 0.18
+	match icon:
+		"arrow_up":
+			_canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -s), c + Vector2(s, s * 0.7), c + Vector2(-s, s * 0.7)]), COLOR_TEXT)
+		"arrow_down":
+			_canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(0, s), c + Vector2(-s, -s * 0.7), c + Vector2(s, -s * 0.7)]), COLOR_TEXT)
+		"arrow_left":
+			_canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(-s, 0), c + Vector2(s * 0.7, -s), c + Vector2(s * 0.7, s)]), COLOR_TEXT)
+		"arrow_right":
+			_canvas.draw_colored_polygon(PackedVector2Array([c + Vector2(s, 0), c + Vector2(-s * 0.7, s), c + Vector2(-s * 0.7, -s)]), COLOR_TEXT)
+		"pause":
+			var bar := Vector2(s * 0.45, s * 2.0)
+			_canvas.draw_rect(Rect2(c + Vector2(-s * 0.75, -s), bar), COLOR_TEXT)
+			_canvas.draw_rect(Rect2(c + Vector2(s * 0.3, -s), bar), COLOR_TEXT)
+		"sound_on", "sound_off":
+			# speaker: box + cone, then waves (on) or a cross (off)
+			var left := c.x - s * 1.1
+			_canvas.draw_rect(Rect2(Vector2(left, c.y - s * 0.35), Vector2(s * 0.5, s * 0.7)), COLOR_TEXT)
+			_canvas.draw_colored_polygon(PackedVector2Array([
+				Vector2(left + s * 0.5, c.y - s * 0.35), Vector2(left + s * 1.1, c.y - s * 0.9),
+				Vector2(left + s * 1.1, c.y + s * 0.9), Vector2(left + s * 0.5, c.y + s * 0.35)]), COLOR_TEXT)
+			var x := c.x + s * 0.35
+			if icon == "sound_on":
+				_canvas.draw_arc(Vector2(x - s * 0.3, c.y), s * 0.45, -PI / 3.0, PI / 3.0, 12, COLOR_TEXT, 3.0)
+				_canvas.draw_arc(Vector2(x - s * 0.3, c.y), s * 0.85, -PI / 3.0, PI / 3.0, 12, COLOR_TEXT, 3.0)
+			else:
+				_canvas.draw_line(Vector2(x, c.y - s * 0.45), Vector2(x + s * 0.8, c.y + s * 0.45), COLOR_TEXT, 3.0)
+				_canvas.draw_line(Vector2(x, c.y + s * 0.45), Vector2(x + s * 0.8, c.y - s * 0.45), COLOR_TEXT, 3.0)
