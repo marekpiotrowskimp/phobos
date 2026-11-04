@@ -54,9 +54,13 @@ var _ui_font_bold: FontVariation
 ## Gameplay HUD controls and their offsets without safe-area margins.
 var _safe_controls: Array[Control] = []
 var _base_offsets := {}
+## FPS counter during gameplay (see should_show_fps).
+var show_fps := should_show_fps(OS.is_debug_build(), OS.get_cmdline_user_args())
 
 ## Width of the menu-screen text column: wide enough for the longest ranking line (≈ 610 px at
 ## 22 px) and narrow enough to stay between the touch d-pad and the OK/BACK buttons.
+const Localization := preload("res://scripts/ui/localization.gd")
+
 const SCREEN_COLUMN_WIDTH := 640.0
 ## Same column as the other menu screens, so the licence text never runs under the touch d-pad.
 const CREDITS_WIDTH := SCREEN_COLUMN_WIDTH
@@ -132,7 +136,7 @@ func _build_hud() -> void:
 
 	kills_label = Label.new()
 	kills_label.add_theme_font_size_override("font_size", 22)
-	kills_label.text = "Zabicia: 0"
+	kills_label.text = Localization.t("hud_kills") % 0
 	kills_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	kills_label.position = Vector2(-300, 22)
 	kills_label.size = Vector2(280, 30)
@@ -203,7 +207,7 @@ func _build_panels() -> void:
 	pause_panel.visible = false
 	add_child(pause_panel)
 	_pause_label = Label.new()
-	_pause_label.text = "PAUZA\nII — WZNÓW"
+	_pause_label.text = Localization.t("pause")
 	_pause_label.add_theme_font_size_override("font_size", 48)
 	_pause_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_pause_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -220,7 +224,7 @@ func _build_panels() -> void:
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_STOP
 	game_over_panel.add_child(bg)
-	_go_title.text = "PRZEGRANA"
+	_go_title.text = Localization.t("go_title")
 	_go_title.add_theme_font_size_override("font_size", 72)
 	_go_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_go_title.set_anchors_preset(Control.PRESET_CENTER)
@@ -246,7 +250,7 @@ func _build_panels() -> void:
 	_go_stats.position = Vector2(-400, 40)
 	_go_stats.size = Vector2(800, 40)
 	game_over_panel.add_child(_go_stats)
-	_go_hint.text = "OK — GRAJ PONOWNIE"
+	_go_hint.text = Localization.t("go_hint")
 	_go_hint.add_theme_font_size_override("font_size", 26)
 	_go_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_go_hint.set_anchors_preset(Control.PRESET_CENTER)
@@ -317,7 +321,7 @@ func apply_safe_margins(margins: Dictionary) -> void:
 func reset() -> void:
 	set_hp(Balance.player_max_hp, Balance.player_max_hp)
 	score_label.text = "0"
-	kills_label.text = "Zabicia: 0"
+	kills_label.text = Localization.t("hud_kills") % 0
 	wave_label.text = ""
 	banner.modulate.a = 0.0
 	od_bar.visible = false
@@ -349,43 +353,44 @@ func set_danger(on: bool) -> void:
 	(vignette.material as ShaderMaterial).set_shader_parameter("danger", 1.0 if on else 0.0)
 
 func set_wave(w: int) -> void:
-	wave_label.text = "FALA %d" % w
+	wave_label.text = Localization.t("hud_wave") % w
 
 func show_gameplay(difficulty: String) -> void:
 	screen_panel.visible = false
 	game_over_panel.visible = false
 	pause_panel.visible = false
-	difficulty_label.text = "POZIOM: %s" % difficulty
+	difficulty_label.text = Localization.t("hud_level") % difficulty
 	set_gameplay_visible(true)
 
 func show_main_menu(selected: int, difficulty: String) -> void:
-	var entries := ["GRAJ", "TRUDNOŚĆ: < %s >" % difficulty, "WYNIKI", "LICENCJE"]
+	var entries := [Localization.t("menu_play"), Localization.t("menu_difficulty") % difficulty,
+		Localization.t("menu_results"), Localization.t("menu_credits")]
 	var lines := PackedStringArray()
 	for i in entries.size():
 		lines.append((">  %s  <" if i == selected else "   %s   ") % entries[i])
-	_show_screen("PHOBOS", "\n".join(lines), "▲▼ WYBÓR  •  OK")
+	_show_screen("PHOBOS", "\n".join(lines), Localization.t("hint_menu"))
 
 func show_initials(chars: PackedStringArray, cursor: int, result: Dictionary, difficulty: String) -> void:
 	var displayed := PackedStringArray()
 	for i in 3:
 		displayed.append("[%s]" % chars[i] if i == cursor else " %s " % chars[i])
-	var body := "NOWY WYNIK: %d\nPOZIOM: %s  •  FALA: %d  •  ZABICIA: %d\n\n%s" % [
+	var body := Localization.t("initials_body") % [
 		int(result.get("score", 0)), difficulty, int(result.get("wave", 0)),
 		int(result.get("kills", 0)), "   ".join(displayed)
 	]
-	_show_screen("WPISZ INICJAŁY", body, "▲▼ LITERA  •  ◀▶ POZYCJA  •  OK")
+	_show_screen(Localization.t("initials_title"), body, Localization.t("hint_initials"))
 
 func show_results(entries: Array, filter_label: String, summary: Dictionary, from_run: bool) -> void:
 	var lines := PackedStringArray()
 	if not summary.is_empty():
-		lines.append("OSTATNI WYNIK: %d  •  %s  •  FALA %d  •  %02d:%02d" % [
+		lines.append(Localization.t("results_last") % [
 			int(summary.get("score", 0)), str(summary.get("difficulty_label", "")),
 			int(summary.get("wave", 0)), int(summary.get("time", 0.0)) / 60,
 			int(summary.get("time", 0.0)) % 60
 		])
 		lines.append("")
-	lines.append("TOP 10  •  < %s >" % filter_label)
-	lines.append("LP   GRACZ    WYNIK      POZIOM       FALA   CZAS")
+	lines.append(Localization.t("results_top") % filter_label)
+	lines.append(Localization.t("results_header"))
 	var count := mini(entries.size(), 10)
 	for i in count:
 		var entry: Dictionary = entries[i]
@@ -396,13 +401,14 @@ func show_results(entries: Array, filter_label: String, summary: Dictionary, fro
 			seconds / 60, seconds % 60
 		])
 	if count == 0:
-		lines.append("\nBRAK ZAPISANYCH WYNIKÓW")
-	var hint := "◀▶ FILTR  •  OK JESZCZE RAZ  •  WSTECZ MENU" if from_run else "◀▶ FILTR  •  OK / WSTECZ MENU"
-	_show_screen("WYNIKI", "\n".join(lines), hint)
+		lines.append("\n" + Localization.t("results_empty"))
+	var hint := Localization.t("hint_results_run" if from_run else "hint_results_menu")
+	_show_screen(Localization.t("results_title"), "\n".join(lines), hint)
 
 func set_gameplay_visible(on: bool) -> void:
-	for control in [wave_label, score_label, kills_label, fps_label, difficulty_label, hp_bar, banner, vignette, flash]:
+	for control in [wave_label, score_label, kills_label, difficulty_label, hp_bar, banner, vignette, flash]:
 		control.visible = on
+	fps_label.visible = on and show_fps
 	if not on:
 		od_bar.visible = false
 
@@ -417,10 +423,10 @@ func _show_screen(title: String, body: String, hint: String) -> void:
 	_screen_hint.text = hint
 
 func set_wave_time(w: int, seconds: int) -> void:
-	wave_label.text = "FALA %d  ·  %02d s" % [w, seconds]
+	wave_label.text = Localization.t("hud_wave_time") % [w, seconds]
 
 func set_wave_cleanup(w: int) -> void:
-	wave_label.text = "FALA %d  ·  OCZYŚĆ ARENĘ" % w
+	wave_label.text = Localization.t("hud_wave_cleanup") % w
 
 func show_banner(text: String) -> void:
 	banner.text = text
@@ -440,7 +446,7 @@ func add_score(v: int) -> void:
 	score_label.text = str(v)
 
 func add_kills(k: int) -> void:
-	kills_label.text = "Zabicia: %d" % k
+	kills_label.text = Localization.t("hud_kills") % k
 
 func start_od_bar(duration: float) -> void:
 	od_bar.visible = true
@@ -456,11 +462,11 @@ func end_od_bar() -> void:
 	od_bar.visible = false
 
 func show_game_over(score: int, best: int, w: int, kills: int, survived: float) -> void:
-	_go_score.text = "WYNIK: %d" % score
-	_go_best.text = "REKORD: %d" % best
+	_go_score.text = Localization.t("go_score") % score
+	_go_best.text = Localization.t("go_best") % best
 	var minutes := int(survived) / 60
 	var seconds := int(survived) % 60
-	_go_stats.text = "Fala %d  |  Zabicia: %d  |  Czas: %02d:%02d" % [w, kills, minutes, seconds]
+	_go_stats.text = Localization.t("go_stats") % [w, kills, minutes, seconds]
 	game_over_panel.visible = true
 
 func toggle_pause(on: bool) -> void:
@@ -492,7 +498,7 @@ func _build_credits() -> void:
 
 
 func show_credits(text: String) -> void:
-	_show_screen("LICENCJE", "", "▲▼ PRZEWIŃ  •  OK / WSTECZ MENU")
+	_show_screen(Localization.t("credits_title"), "", Localization.t("hint_credits"))
 	_credits_label.text = text
 	_credits_scroll.visible = true
 	_credits_scroll.scroll_vertical = 0
@@ -509,3 +515,11 @@ func credits_scroll() -> float:
 
 func credits_text() -> String:
 	return _credits_label.text
+
+
+# ------------------------------------------------------------ FPS counter
+
+## The FPS counter is a development aid: shown in debug builds or with `--show-fps`, never in
+## the App Store (release template) build.
+static func should_show_fps(is_debug: bool, args: PackedStringArray) -> bool:
+	return is_debug or "--show-fps" in args

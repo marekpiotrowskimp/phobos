@@ -6,6 +6,7 @@ const TouchControlsScript := preload("res://scripts/touch/touch_controls.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const AimAssist := preload("res://scripts/touch/aim_assist.gd")
 const Credits := preload("res://scripts/ui/credits.gd")
+const Localization := preload("res://scripts/ui/localization.gd")
 ## Orthographic camera height at the 16:9 design size; on narrower screens (iPad 4:3) the
 ## same horizontal extent is kept instead, so the whole arena always stays on screen.
 const CAMERA_HEIGHT := 27.5
@@ -181,7 +182,7 @@ func _begin_wave() -> void:
 	_last_wave_second = ceili(wave_time_left)
 	_wave_started_at = run_time
 	hud.set_wave_time(wave, _last_wave_second)
-	hud.show_banner("FALA %d" % wave)
+	hud.show_banner(Localization.t("hud_wave") % wave)
 	hud.add_score(GameState.score)
 	if not _wave_warned:
 		AudioLib.play_sfx("wave_start", 1.0, -2.0)
@@ -247,7 +248,7 @@ func _on_wave_cleared() -> void:
 	var bonus := wave * Balance.wave_bonus_per
 	GameState.add_score(bonus)
 	hud.add_score(GameState.score)
-	hud.show_banner("FALA %d UDANA  +%d" % [wave, bonus])
+	hud.show_banner(Localization.t("banner_wave_cleared") % [wave, bonus])
 	AudioLib.play_sfx("wave_clear")
 	AudioLib.set_music_intensity(0)
 	_begin_break(Balance.break_time)
@@ -560,9 +561,10 @@ func _touch_aim_assist(dir: Vector2) -> Vector2:
 	return AimAssist.pick(origin, dir, targets, TouchControlsScript.AIM_ASSIST_DEG)
 
 func _notification(what: int) -> void:
-	if what != NOTIFICATION_APPLICATION_PAUSED:
+	if what != NOTIFICATION_APPLICATION_PAUSED and what != NOTIFICATION_APPLICATION_FOCUS_OUT:
 		return
-	# iOS: the app went to the background — drop held touches and pause a running round.
+	# iOS: the app went to the background, or lost focus (Control Center, notification banner,
+	# incoming call) — drop held touches and pause a running round.
 	if touch_controls != null:
 		touch_controls.release_all()
 	if screen == "game" and state != "over" and not get_tree().paused:
@@ -722,10 +724,14 @@ func _reload_to(mode: String) -> void:
 	get_tree().paused = false
 	get_tree().reload_current_scene()
 
+## Difficulty ids ("easy", "normal", "hard", "all") are translated here; GameState keeps the ids.
+## An id without a translation (a difficulty added later) is shown as the id itself, never as a
+## Polish label in the English UI.
 func _difficulty_label(difficulty: String) -> String:
-	if difficulty == GameState.ALL_DIFFICULTIES:
-		return "WSZYSTKIE"
-	return str(GameState.DIFFICULTY_LABELS.get(difficulty, difficulty.to_upper()))
+	var key := "difficulty_" + difficulty
+	if Localization.keys(Localization.current()).has(key):
+		return Localization.t(key)
+	return difficulty.to_upper()
 
 func _debug_tick(delta: float) -> void:
 	_at_t += delta
