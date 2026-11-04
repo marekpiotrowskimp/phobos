@@ -10,7 +10,9 @@ IOS_DIR="$ROOT/ports/ios/project"
 MACOS_APP="$PROJECT_DIR/build/PHOBOS.app"
 AMIGA_ADF="$AMIGA_DIR/build/PHOBOS-A500.adf"
 IOS_IPA="$IOS_DIR/build/PHOBOS.ipa"
-IOS_XCODEPROJ="$IOS_DIR/build/xcode/PHOBOS.xcodeproj"
+# PHOBOS_IOS_XCODE_DIR redirects the ios-xcode export (the tests use it, so they never overwrite
+# the project you have open in Xcode).
+IOS_XCODEPROJ="${PHOBOS_IOS_XCODE_DIR:-$IOS_DIR/build/xcode}/PHOBOS.xcodeproj"
 
 if [[ -t 1 ]]; then
 	C_INFO=$'\033[1;34m' C_OK=$'\033[1;32m' C_WARN=$'\033[1;33m' C_ERR=$'\033[1;31m' C_OFF=$'\033[0m'
@@ -35,6 +37,9 @@ Targets:
   ios       iOS/iPadOS     → ports/ios/project/build/PHOBOS.ipa (signed, needs Apple account)
   ios-xcode iOS/iPadOS     → ports/ios/project/build/xcode/PHOBOS.xcodeproj (unsigned)
   -h      show this help
+
+Environment:
+  PHOBOS_IOS_XCODE_DIR  output directory for ios-xcode instead of ports/ios/project/build/xcode
 
 Missing tools are installed automatically via Homebrew.
 EOF
@@ -176,9 +181,10 @@ ensure_full_xcode() {
 	fi
 }
 
-# build_ios <preset> <output path relative to ports/ios/project>
+# build_ios <preset> <output path: absolute, or relative to ports/ios/project>
 build_ios() {
 	local preset=$1 output=$2
+	[[ "$output" == /* ]] || output="$IOS_DIR/$output"
 	ensure_full_xcode
 	log "iOS build ($preset)"
 	ensure_godot
@@ -189,10 +195,10 @@ build_ios() {
 		godot --headless --path "$IOS_DIR" --import
 	fi
 
-	mkdir -p "$IOS_DIR/$(dirname "$output")"
+	mkdir -p "$(dirname "$output")"
 	godot --headless --path "$IOS_DIR" --export-release "$preset" "$output"
-	[[ -e "$IOS_DIR/$output" ]] || die "Export failed — $IOS_DIR/$output is missing."
-	ok "iOS: $IOS_DIR/$output"
+	[[ -e "$output" ]] || die "Export failed — $output is missing."
+	ok "iOS: $output"
 }
 
 # ---------------------------------------------------------------- main
@@ -221,7 +227,7 @@ main() {
 		macos) build_macos ;;
 		amiga) build_amiga ;;
 		ios)   build_ios "iOS" build/PHOBOS.ipa ;;
-		ios-xcode) build_ios "iOS Xcode" build/xcode/PHOBOS.xcodeproj ;;
+		ios-xcode) build_ios "iOS Xcode" "$IOS_XCODEPROJ" ;;
 		all)   build_macos; build_amiga ;;
 	esac
 
