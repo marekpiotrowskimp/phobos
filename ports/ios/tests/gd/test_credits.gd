@@ -5,7 +5,7 @@ extends RefCounted
 
 const CREDITS := "res://scripts/ui/credits.gd"
 const FONT_LICENSES := ["res://assets/fonts/OFL-Oxanium.txt", "res://assets/fonts/OFL-Tektur.txt"]
-const CREDITS_HINT := "▲▼ PRZEWIŃ  •  OK / WSTECZ MENU"
+const CREDITS_HINT := "GÓRA/DÓŁ PRZEWIŃ  •  OK / WSTECZ MENU"
 
 
 func _text(t) -> String:

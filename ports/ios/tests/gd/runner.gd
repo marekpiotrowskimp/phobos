@@ -21,6 +21,9 @@ func _run() -> void:
 	# Headless has a 0x0 window, so the root viewport is 64x64 and the canvas_items stretch would
 	# scale touch positions ×20. Give it the real design size so event coords = viewport coords.
 	root.size = Vector2i(VIEWPORT)
+	# The UI language follows the device; the suites assert Polish texts unless they switch to
+	# English themselves (set_language), so pin Polish regardless of the machine's locale.
+	set_language("pl")
 	await process_frame  # autoloads ready
 	var script: Script = load(args[0])
 	if script == null:
@@ -142,6 +145,13 @@ func joy_axis(axis: JoyAxis, value: float) -> void:
 	ev.axis_value = value
 	Input.parse_input_event(ev)
 	await frames(2)
+
+
+## Forces the UI language (Localization.override_language) for everything created afterwards.
+func set_language(lang: String) -> void:
+	var i18n: Script = load("res://scripts/ui/localization.gd")
+	if i18n != null:
+		i18n.set("override_language", lang)
 
 
 ## Instantiates scenes/main.tscn and waits until it shows the main menu.

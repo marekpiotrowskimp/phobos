@@ -238,8 +238,9 @@ func test_main_unknown_safe_area_keeps_edges(t) -> void:
 
 # ------------------------------------------------------------ AC-6: menu screens vs buttons
 
-func _check_screen_layout(t, size: Vector2i, margins_safe: Rect2i) -> void:
+func _check_screen_layout(t, size: Vector2i, margins_safe: Rect2i, lang := "pl") -> void:
 	await _resize(t, size)
+	t.set_language(lang)
 	var main: Node = await t.spawn_main()
 	if margins_safe != Rect2i() and _has(t, main, "apply_safe_area"):
 		main.apply_safe_area(margins_safe, size)
@@ -274,20 +275,29 @@ func test_screen_layout_ipad(t) -> void:
 	await _check_screen_layout(t, IPAD, IPAD_SAFE)
 
 
+# English UI: the same worst-case ranking must fit (texts differ in length).
+func test_screen_layout_iphone_en(t) -> void:
+	await _check_screen_layout(t, IPHONE, IPHONE_SAFE, "en")
+
+
+func test_screen_layout_ipad_en(t) -> void:
+	await _check_screen_layout(t, IPAD, IPAD_SAFE, "en")
+
+
 # ------------------------------------------------------------ AC-7: touch hints, AC-8: font size
 
 func test_touch_hints(t) -> void:
 	var main: Node = await t.spawn_main()
 	var hud: Node = main.hud
-	t.eq("▲▼ WYBÓR  •  OK", hud._screen_hint.text, "menu hint")
+	t.eq("GÓRA/DÓŁ WYBÓR  •  OK", hud._screen_hint.text, "menu hint (no ▲▼: the game fonts have no arrow glyphs)")
 	main.run_difficulty = "normal"
 	main._pending_result = {"score": 100, "wave": 2, "kills": 5, "time": 30.0, "difficulty": "normal"}
 	main._show_initials()
-	t.eq("▲▼ LITERA  •  ◀▶ POZYCJA  •  OK", hud._screen_hint.text, "initials hint")
+	t.eq("GÓRA/DÓŁ LITERA  •  ‹ › POZYCJA  •  OK", hud._screen_hint.text, "initials hint")
 	hud.show_results([], "WSZYSTKIE", {}, true)
-	t.eq("◀▶ FILTR  •  OK JESZCZE RAZ  •  WSTECZ MENU", hud._screen_hint.text, "results hint after a run")
+	t.eq("‹ › FILTR  •  OK JESZCZE RAZ  •  WSTECZ MENU", hud._screen_hint.text, "results hint after a run")
 	hud.show_results([], "WSZYSTKIE", {}, false)
-	t.eq("◀▶ FILTR  •  OK / WSTECZ MENU", hud._screen_hint.text, "results hint from the menu")
+	t.eq("‹ › FILTR  •  OK / WSTECZ MENU", hud._screen_hint.text, "results hint from the menu")
 	t.eq("PAUZA\nII — WZNÓW", hud._pause_label.text, "pause label")
 	t.eq("OK — GRAJ PONOWNIE", hud._go_hint.text, "game over hint")
 
