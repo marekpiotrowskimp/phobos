@@ -9,7 +9,6 @@ extends CanvasLayer
 
 const VirtualStick := preload("res://scripts/touch/virtual_stick.gd")
 
-const STICK_RADIUS := 80.0
 ## Aim assist: the thumb's direction snaps to an enemy within ±AIM_ASSIST_DEG (touch only).
 const AIM_ASSIST_DEG := 15.0
 ## Dead zones player.gd applies when it reads move_* / aim_* (Input.get_vector). The touch layer
@@ -49,8 +48,6 @@ var _canvas: Control
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 50
-	left_stick.radius = STICK_RADIUS
-	right_stick.radius = STICK_RADIUS
 	_canvas = Control.new()
 	_canvas.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -202,14 +199,18 @@ func _emit_action(action: String) -> void:
 
 func _apply_sticks() -> void:
 	_set_axis("move", _compensate(left_stick.vector(), PLAYER_MOVE_DEADZONE))
+	# The right stick carries direction only: once the thumb leaves the dead zone the aim has full
+	# length, so player.gd (which ignores aim shorter than 0.12) turns as soon as the gun fires.
 	var aim := right_stick.vector()
-	var strength := aim.length()
-	if strength > 0.0 and aim_assist.is_valid():
-		var assisted: Vector2 = aim_assist.call(aim)
-		if assisted.length_squared() > 0.0:
-			aim = assisted.normalized() * strength
+	var aiming := aim.length_squared() > 0.0
+	if aiming:
+		aim = aim.normalized()
+		if aim_assist.is_valid():
+			var assisted: Vector2 = aim_assist.call(aim)
+			if assisted.length_squared() > 0.0:
+				aim = assisted.normalized()
 	_set_axis("aim", _compensate(aim, PLAYER_AIM_DEADZONE))
-	_set_action("shoot", 1.0 if strength > 0.0 else 0.0)
+	_set_action("shoot", 1.0 if aiming else 0.0)
 
 
 ## Scales a 0…1 stick vector so that after `deadzone` is removed again (Input.get_vector) the
@@ -262,5 +263,12 @@ func _draw_overlay() -> void:
 			HORIZONTAL_ALIGNMENT_CENTER, r.size.x, 28, COLOR_TEXT)
 	for stick in [left_stick, right_stick]:
 		if stick.is_active():
-			_canvas.draw_circle(stick.origin, STICK_RADIUS, COLOR_BASE)
-			_canvas.draw_circle(stick.origin + stick.vector() * STICK_RADIUS, STICK_RADIUS * 0.4, COLOR_KNOB)
+			_canvas.draw_circle(stick.origin, stick.radius, COLOR_BASE)
+			_canvas.draw_circle(knob_position(stick), stick.radius * 0.4, COLOR_KNOB)
+
+
+## Where the knob of `stick` is drawn (canvas px); ZERO when the stick is not held.
+func knob_position(stick) -> Vector2:
+	if not stick.is_active():
+		return Vector2.ZERO
+	return stick.origin + (stick.current - stick.origin).limit_length(stick.radius)

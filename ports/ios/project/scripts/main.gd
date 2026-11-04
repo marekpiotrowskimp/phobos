@@ -9,6 +9,9 @@ const AimAssist := preload("res://scripts/touch/aim_assist.gd")
 ## same horizontal extent is kept instead, so the whole arena always stays on screen.
 const CAMERA_HEIGHT := 27.5
 const DESIGN_ASPECT := 1280.0 / 720.0
+## iOS: pickups are collected from a little further away (pickup.gd builds them with 0.45),
+## so a thumb-steered player does not have to hit the orb dead-on.
+const PICKUP_COLLECT_RADIUS := 0.75
 const RESULT_FILTERS := ["all", "easy", "normal", "hard"]
 
 var player: Player
@@ -540,6 +543,12 @@ func _on_player_died() -> void:
 		_show_results(true)
 
 ## Touch aim assist: bends the stick direction (arena x/z) towards the nearest-in-angle enemy.
+func _widen_pickup(pickup: Pickup) -> void:
+	for child in pickup.get_children():
+		if child is CollisionShape3D and (child as CollisionShape3D).shape is SphereShape3D:
+			((child as CollisionShape3D).shape as SphereShape3D).radius = PICKUP_COLLECT_RADIUS
+
+
 func _touch_aim_assist(dir: Vector2) -> Vector2:
 	var targets: Array = []
 	for enemy in enemy_pool:
@@ -787,6 +796,7 @@ func _build_pools() -> void:
 		pickup.process_mode = Node.PROCESS_MODE_PAUSABLE
 		add_child(pickup)
 		pickup.collected.connect(_on_pickup_collected)
+		_widen_pickup(pickup)
 		pickup.hide_pickup()
 		pickup_pool.append(pickup)
 	_build_tracer_pool(Balance.tracer_count)
