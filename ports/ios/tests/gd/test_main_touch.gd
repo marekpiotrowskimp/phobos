@@ -61,9 +61,9 @@ func test_mouse_emulation_from_touch_disabled(t) -> void:
 
 func test_menu_has_no_quit(t) -> void:
 	var main: Node = await t.spawn_main()
-	t.eq(["play", "difficulty", "results"], main.MENU_ITEMS, "iOS menu items (no quit — Apple forbids quitting apps)")
+	t.eq(["play", "difficulty", "results", "credits"], main.MENU_ITEMS, "iOS menu items: + LICENCJE (etap 04), no quit — Apple forbids quitting apps")
 	var body: String = main.hud._screen_body.text
-	t.ok(body.contains("GRAJ") and body.contains("WYNIKI"), "menu still shows GRAJ and WYNIKI")
+	t.ok(body.contains("GRAJ") and body.contains("WYNIKI") and body.contains("LICENCJE"), "menu shows GRAJ, WYNIKI and LICENCJE")
 	t.ok(not body.contains("WYJŚCIE"), "menu does not show WYJŚCIE")
 
 
@@ -90,7 +90,7 @@ func test_menu_navigation_by_touch(t) -> void:
 	await t.tap(nav["menu_up"])
 	t.eq(0, main._menu_index, "tap ▲ selects PLAY")
 	await t.tap(nav["menu_up"])
-	t.eq(2, main._menu_index, "tap ▲ on PLAY wraps to RESULTS (3 items)")
+	t.eq(3, main._menu_index, "tap ▲ on PLAY wraps to LICENCJE (4 items)")
 	await t.tap(nav["menu_down"])
 	await t.tap(nav["menu_confirm"])
 	t.eq("game", main.screen, "tap OK on PLAY starts a run")
