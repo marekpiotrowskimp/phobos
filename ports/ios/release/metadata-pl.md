@@ -29,6 +29,7 @@ ROZGRYWKA
 BEZ KOMPROMISÓW
 • Bez reklam, bez zakupów w aplikacji, bez kont i bez zbierania danych.
 • Gra działa w pełni offline.
+• Wersja polska i angielska — gra wybiera język zgodnie z ustawieniem urządzenia.
 
 Oprawa w stylu bio-industrialnego horroru: ciemna metalowa arena, organiczne formy i proceduralnie generowana muzyka, która narasta razem z presją na arenie.
 

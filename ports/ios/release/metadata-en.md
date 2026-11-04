@@ -29,6 +29,7 @@ GAMEPLAY
 NO STRINGS ATTACHED
 • No ads, no in-app purchases, no accounts and no data collection.
 • Plays fully offline.
+• Available in English and Polish — the game follows your device language.
 
 Bio-industrial horror style: a dark metal arena overgrown by organic forms and procedurally generated music that builds up with the pressure on the arena.
 
