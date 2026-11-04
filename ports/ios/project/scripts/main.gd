@@ -11,7 +11,7 @@ const CAMERA_HEIGHT := 27.5
 const DESIGN_ASPECT := 1280.0 / 720.0
 ## iOS: pickups are collected from a little further away (pickup.gd builds them with 0.45),
 ## so a thumb-steered player does not have to hit the orb dead-on.
-const PICKUP_COLLECT_RADIUS := 0.75
+const PICKUP_COLLECT_RADIUS := 0.9
 const RESULT_FILTERS := ["all", "easy", "normal", "hard"]
 
 var player: Player
