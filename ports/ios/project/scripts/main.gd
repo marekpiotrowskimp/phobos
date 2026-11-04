@@ -1,10 +1,11 @@
 extends Node3D
 
 # iOS: no "quit" item — apps must not terminate themselves (App Store guidelines).
-const MENU_ITEMS := ["play", "difficulty", "results"]
+const MENU_ITEMS := ["play", "difficulty", "results", "credits"]
 const TouchControlsScript := preload("res://scripts/touch/touch_controls.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const AimAssist := preload("res://scripts/touch/aim_assist.gd")
+const Credits := preload("res://scripts/ui/credits.gd")
 ## Orthographic camera height at the 16:9 design size; on narrower screens (iPad 4:3) the
 ## same horizontal extent is kept instead, so the whole arena always stays on screen.
 const CAMERA_HEIGHT := 27.5
@@ -55,6 +56,7 @@ var _first_wave_groups := 0
 var _max_alive_seen := 0
 var _director_violation := false
 var _kills_since_heal_drop := 0
+var _credits_text := ""
 var _heal_drops := 0
 var _overdrive_drops := 0
 var _forced_heals := 0
@@ -580,6 +582,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_handle_initials_input(event)
 		"results":
 			_handle_results_input(event)
+		"credits":
+			_handle_credits_input(event)
 		"game":
 			if event.is_action_pressed("pause") and state != "over":
 				get_tree().paused = not get_tree().paused
@@ -610,6 +614,8 @@ func _handle_menu_input(event: InputEvent) -> void:
 			"results":
 				_results_filter_index = 0
 				_show_results(false)
+			"credits":
+				_show_credits()
 		return
 	hud.show_main_menu(_menu_index, _difficulty_label(GameState.selected_difficulty))
 
@@ -695,6 +701,21 @@ func _handle_results_input(event: InputEvent) -> void:
 			_reload_to("menu")
 		else:
 			_show_main_menu()
+
+func _show_credits() -> void:
+	screen = "credits"
+	get_tree().paused = true
+	if _credits_text.is_empty():
+		_credits_text = Credits.text()  # built once: reads the licence files, ~90 KB
+	hud.show_credits(_credits_text)
+
+func _handle_credits_input(event: InputEvent) -> void:
+	if event.is_action_pressed("menu_up"):
+		hud.scroll_credits(-1)
+	elif event.is_action_pressed("menu_down"):
+		hud.scroll_credits(1)
+	elif event.is_action_pressed("menu_confirm") or event.is_action_pressed("menu_back"):
+		_show_main_menu()
 
 func _reload_to(mode: String) -> void:
 	GameState.request_boot_mode(mode)

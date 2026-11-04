@@ -45,6 +45,8 @@ var _go_hint: Label
 var _screen_title: Label
 var _screen_body: Label
 var _screen_hint: Label
+var _credits_scroll: ScrollContainer
+var _credits_label: Label
 var _pause_label: Label
 var _display_font: FontVariation
 var _ui_font: FontVariation
@@ -56,6 +58,10 @@ var _base_offsets := {}
 ## Width of the menu-screen text column: wide enough for the longest ranking line (≈ 610 px at
 ## 22 px) and narrow enough to stay between the touch d-pad and the OK/BACK buttons.
 const SCREEN_COLUMN_WIDTH := 640.0
+## Same column as the other menu screens, so the licence text never runs under the touch d-pad.
+const CREDITS_WIDTH := SCREEN_COLUMN_WIDTH
+## Pixels scrolled by one ▲ / ▼ press on the credits screen.
+const CREDITS_SCROLL_STEP := 240
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -102,6 +108,8 @@ func _apply_fonts() -> void:
 		label.add_theme_font_override("font", _ui_font)
 		label.add_theme_constant_override("outline_size", 2)
 		label.add_theme_color_override("font_outline_color", Color(0.0, 0.02, 0.035, 0.9))
+	# ~90 KB of licence text on an opaque panel: no outline (it would double the glyphs drawn).
+	_credits_label.add_theme_font_override("font", _ui_font)
 
 func _build_hud() -> void:
 	wave_label = Label.new()
@@ -272,6 +280,7 @@ func _build_panels() -> void:
 	_center_in_screen(_screen_hint, 265.0, 38.0)
 	_screen_hint.add_theme_color_override("font_color", Color(0.42, 0.72, 0.82))
 	screen_panel.add_child(_screen_hint)
+	_build_credits()
 
 ## Anchors a menu-screen label to the screen centre: SCREEN_COLUMN_WIDTH wide, `height` tall,
 ## its top edge `top` px from the vertical centre (the 1280x720 layout kept, but centred).
@@ -350,7 +359,7 @@ func show_gameplay(difficulty: String) -> void:
 	set_gameplay_visible(true)
 
 func show_main_menu(selected: int, difficulty: String) -> void:
-	var entries := ["GRAJ", "TRUDNOŚĆ: < %s >" % difficulty, "WYNIKI"]
+	var entries := ["GRAJ", "TRUDNOŚĆ: < %s >" % difficulty, "WYNIKI", "LICENCJE"]
 	var lines := PackedStringArray()
 	for i in entries.size():
 		lines.append((">  %s  <" if i == selected else "   %s   ") % entries[i])
@@ -402,6 +411,7 @@ func _show_screen(title: String, body: String, hint: String) -> void:
 	game_over_panel.visible = false
 	pause_panel.visible = false
 	screen_panel.visible = true
+	_credits_scroll.visible = false
 	_screen_title.text = title
 	_screen_body.text = body
 	_screen_hint.text = hint
@@ -455,3 +465,47 @@ func show_game_over(score: int, best: int, w: int, kills: int, survived: float) 
 
 func toggle_pause(on: bool) -> void:
 	pause_panel.visible = on
+
+
+# ------------------------------------------------------------ credits (LICENCJE)
+
+## Scrollable licence text in the place of the screen body (same vertical band, wider column).
+func _build_credits() -> void:
+	_credits_scroll = ScrollContainer.new()
+	_credits_scroll.anchor_left = 0.5
+	_credits_scroll.anchor_right = 0.5
+	_credits_scroll.anchor_top = 0.5
+	_credits_scroll.anchor_bottom = 0.5
+	_credits_scroll.offset_left = -CREDITS_WIDTH * 0.5
+	_credits_scroll.offset_right = CREDITS_WIDTH * 0.5
+	_credits_scroll.offset_top = -225.0
+	_credits_scroll.offset_bottom = 215.0
+	_credits_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_credits_scroll.visible = false
+	screen_panel.add_child(_credits_scroll)
+	_credits_label = Label.new()
+	_credits_label.add_theme_font_size_override("font_size", 22)
+	_credits_label.add_theme_color_override("font_color", Color(0.84, 0.9, 0.94))
+	_credits_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_credits_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_credits_scroll.add_child(_credits_label)
+
+
+func show_credits(text: String) -> void:
+	_show_screen("LICENCJE", "", "▲▼ PRZEWIŃ  •  OK / WSTECZ MENU")
+	_credits_label.text = text
+	_credits_scroll.visible = true
+	_credits_scroll.scroll_vertical = 0
+
+
+## Scrolls by `step` presses (negative = up); the container clamps to the text's ends.
+func scroll_credits(step: int) -> void:
+	_credits_scroll.scroll_vertical += step * CREDITS_SCROLL_STEP
+
+
+func credits_scroll() -> float:
+	return float(_credits_scroll.scroll_vertical)
+
+
+func credits_text() -> String:
+	return _credits_label.text
