@@ -110,9 +110,44 @@ func test_game_aim_tracks_moving_enemy(t) -> void:
 	t.ok(_deg(_aim(), to_enemy) < 1.0, "finger still, enemy moved to 5° above → aim follows it (off by %.1f°)" % _deg(_aim(), to_enemy))
 
 
+func _player_aim(main: Node) -> Vector2:
+	var d: Vector3 = main.player._aim_dir
+	return Vector2(d.x, d.z)
+
+
+## Waits n physics ticks (player.gd turns in _physics_process; process frames may outrun it).
+func _ticks(t, n: int) -> void:
+	for i in n:
+		await t.physics_frame
+
+
 func test_game_pad_aim_not_assisted(t) -> void:
+	# A finger on the LEFT (move) stick keeps the touch layer busy; pad aim still must not snap.
 	var main: Node = await _arena_with_enemy(t, 10.0)
+	await t.touch_down(0, Vector2(300, 400))
+	await t.touch_drag(0, Vector2(300, 420))
 	Input.action_press("aim_right", 1.0)
-	await t.frames(3)
-	t.ok(_deg(_aim(), Vector2.RIGHT) < 0.5, "pad / keyboard aim right stays exactly right (off by %.1f°)" % _deg(_aim(), Vector2.RIGHT))
+	await _ticks(t, 30)
+	t.ok(_deg(_player_aim(main), Vector2.RIGHT) < 0.5, "pad aim right + finger on move stick → player faces exactly right (off by %.1f°)" % _deg(_player_aim(main), Vector2.RIGHT))
 	Input.action_release("aim_right")
+
+
+func test_game_player_turns_to_assisted_target(t) -> void:
+	var main: Node = await _arena_with_enemy(t, 10.0)
+	await t.touch_down(0, Vector2(1000, 400))
+	await t.touch_drag(0, Vector2(1048, 400))
+	await _ticks(t, 30)
+	var e: Node = main.enemy_pool[0]
+	var rel: Vector3 = e.global_position - main.player.global_position
+	var to_enemy := Vector2(rel.x, rel.z)
+	t.ok(_deg(_player_aim(main), to_enemy) < 2.0, "player model faces the assisted enemy where it is now (off by %.1f°)" % _deg(_player_aim(main), to_enemy))
+
+
+func test_game_small_drag_turns_player(t) -> void:
+	var main: Node = await _arena_with_enemy(t, 90.0 + 45.0)  # enemy far outside the cone
+	t.ok(_deg(_player_aim(main), Vector2.RIGHT) > 30.0, "before the drag the player does not face right (off by %.1f°)" % _deg(_player_aim(main), Vector2.RIGHT))
+	await t.touch_down(0, Vector2(1000, 400))
+	await t.touch_drag(0, Vector2(1010, 400))
+	await _ticks(t, 30)
+	t.ok(_deg(_player_aim(main), Vector2.RIGHT) < 2.0, "10 px right → player turns right (off by %.1f°)" % _deg(_player_aim(main), Vector2.RIGHT))
+	t.eq(true, Input.is_action_pressed("shoot"), "and fires at the same time")

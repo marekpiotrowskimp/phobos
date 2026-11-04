@@ -70,7 +70,9 @@ func test_right_stick_aims_and_fires(t) -> void:
 	t.approx_v(Vector2.ZERO, _aim(), "6 px does not aim", 0.01)
 	await t.touch_drag(0, Vector2(1000, 388))
 	t.eq(true, Input.is_action_pressed("shoot"), "12 px already fires")
-	t.ok(_aim().length() > 0.05 and absf(_aim().angle_to(Vector2.UP)) < 0.02, "12 px up → player aims up (got %s)" % _aim())
+	# aim carries the direction only: full length as soon as the thumb leaves the dead zone,
+	# so player.gd (which ignores aim shorter than 0.12) turns as soon as the gun fires
+	t.approx_v(Vector2.UP, _aim(), "12 px up → full-length aim up", 0.01)
 	await t.touch_drag(0, Vector2(1048, 400))
 	t.approx_v(Vector2(1.0, 0.0), _aim(), "48 px right → full aim right", 0.01)
 	t.eq(true, Input.is_action_pressed("shoot"), "fires while aiming")
@@ -160,3 +162,53 @@ func test_pausing_releases_sticks(t) -> void:
 	tc.paused = true
 	await t.frames(2)
 	t.approx_v(Vector2.ZERO, _move(), "pausing releases the held stick", 0.001)
+
+
+# ------------------------------------------------ poprawki celowania (ios-celowanie-i-zbieranie)
+
+func test_small_aim_is_full_length(t) -> void:
+	var tc: Node = await t.spawn_touch("game", false)
+	if tc == null: return
+	await t.touch_down(0, Vector2(1000, 400))
+	await t.touch_drag(0, Vector2(1010, 400))
+	t.approx_v(Vector2.RIGHT, _aim(), "10 px right → full-length aim right (player.gd turns above 0.12)", 0.01)
+	t.eq(true, Input.is_action_pressed("shoot"), "10 px fires")
+	await t.touch_drag(0, Vector2(1014, 414))
+	t.approx_v(Vector2(1, 1).normalized(), _aim(), "14 px right + 14 px down (45°) → full-length diagonal aim", 0.01)
+
+
+func test_move_stick_keeps_graded_speed(t) -> void:
+	var tc: Node = await t.spawn_touch("game", false)
+	if tc == null: return
+	await t.touch_down(0, Vector2(300, 400))
+	await t.touch_drag(0, Vector2(310, 400))
+	t.approx_v(Vector2(0.05, 0.0), _move(), "left stick stays graded: 10 px → 0.05 (unchanged)", 0.01)
+
+
+func test_single_stick_radius(t) -> void:
+	var tc: Node = await t.spawn_touch("game", false)
+	if tc == null: return
+	t.eq(false, tc.get_script().get_script_constant_map().has("STICK_RADIUS"), "touch_controls has no own STICK_RADIUS — VirtualStick.radius is the only source")
+	t.approx(80.0, tc.left_stick.radius, "left stick radius 80 px (VirtualStick default)")
+	t.approx(80.0, tc.right_stick.radius, "right stick radius 80 px (VirtualStick default)")
+
+
+func test_knob_follows_finger(t) -> void:
+	var tc: Node = await t.spawn_touch("game", false)
+	if tc == null: return
+	await t.touch_down(0, Vector2(300, 400))
+	await t.touch_drag(0, Vector2(320, 400))
+	t.approx_v(Vector2(320, 400), tc.knob_position(tc.left_stick), "20 px drag → knob under the finger")
+	await t.touch_drag(0, Vector2(500, 400))
+	t.approx_v(Vector2(500, 400), tc.knob_position(tc.left_stick), "200 px drag → knob under the finger")
+	t.approx(80.0, tc.knob_position(tc.left_stick).distance_to(tc.left_stick.origin), "knob at most one radius from the base")
+	t.approx_v(Vector2.ZERO, tc.knob_position(tc.right_stick), "inactive stick → no knob (ZERO)")
+
+
+func test_knob_respects_stick_radius(t) -> void:
+	var tc: Node = await t.spawn_touch("game", false)
+	if tc == null: return
+	tc.left_stick.radius = 50.0
+	await t.touch_down(0, Vector2(300, 400))
+	await t.touch_drag(0, Vector2(500, 400))
+	t.approx(50.0, tc.knob_position(tc.left_stick).distance_to(tc.left_stick.origin), "radius changed on the stick → knob clamp follows it (50 px)")
