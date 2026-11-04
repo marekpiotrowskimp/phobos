@@ -95,3 +95,5 @@ tylko z `PHOBOS_IOS_SIGNED=1`.
 - Aplikacja uruchamia się na fizycznym iPhonie przez Xcode, nawet bez sterowania dotykowego.
 - `./build.sh macos` daje identyczny wynik jak przed zmianą, a drzewo `project/` jest niezmienione.
 - Akceptacja użytkownika.
+
+**Status: `APPROVED`** (2026-11-04, testy ręczne na urządzeniu OK).

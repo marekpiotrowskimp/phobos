@@ -49,3 +49,5 @@ ani pasek Home.
 - Ranking przetrwał restart i aktualizację aplikacji.
 - Drzewo `project/` (macOS) jest niezmienione.
 - Akceptacja użytkownika.
+
+**Status: `APPROVED`** (2026-11-04). Safe area poprawna od pierwszej klatki przy zimnym starcie, sprawdzone ręcznie.

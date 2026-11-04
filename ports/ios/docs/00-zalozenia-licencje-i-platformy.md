@@ -23,7 +23,7 @@ Stan prawny i cennikowy sprawdzony 2026-11-03. Przed wydaniem trzeba go sprawdzi
 | Fonty Oxanium, Tektur | SIL OFL 1.1 (`project/assets/fonts/OFL-*.txt`) | Wolno je osadzić w płatnej grze. Tekst licencji musi być dostępny w aplikacji (ekran Credits). Nie wolno sprzedawać samych fontów. |
 | Efekty dźwiękowe i muzyka | Synteza proceduralna w `project/scripts/autoloads/audio_lib.gd` | Własne, bez obcych praw. |
 | Sprite'y PNG/SVG (`project/assets/sprites/`) | Wygenerowane przez AI (Claude Code, model Opus 5.5) w trakcie pracy nad projektem | Warunki Anthropic przekazują prawa do wygenerowanych treści użytkownikowi, więc komercyjne użycie jest dozwolone. Treść wygenerowana w całości przez AI może nie podlegać ochronie prawa autorskiego, więc inni mogliby ją kopiować; nie blokuje to jednak publikacji. Fakt użycia AI trzeba odnotować w Credits i w deklaracji App Store Connect, jeśli Apple o to zapyta. |
-| Nazwa „PHOBOS” | — | Nazwa w App Store musi być unikalna. Sprawdzić dostępność w App Store Connect i bazach znaków towarowych (EUIPO, USPTO). W razie konfliktu użyć podtytułu, np. „PHOBOS: Arena”. |
+| Nazwa „PHOBOS” | — | Nazwa w App Store musi być unikalna. **Sprawdzone 2026-11-04:** w App Store jest już aplikacja „Phobos” (Enginko SRL, narzędzie do automatów vendingowych), więc sama nazwa „PHOBOS” jest najpewniej zajęta. Brak gry o tej nazwie na iOS. Gry o podobnych nazwach to „PHOBOS: Rescue” (Steam, Windows) i „Arakno Phobos Arena” (iOS). Propozycja nazwy w sklepie: **„PHOBOS: Arena Survival”**, z napisem w grze bez zmian. Ostateczne potwierdzenie daje rezerwacja nazwy w App Store Connect, a znaki towarowe (EUIPO, USPTO) trzeba jeszcze sprawdzić ręcznie. |
 | Bundle ID | **`com.marek.piotrowski.phobos`** (decyzja 2026-11-03) | Zastępuje `com.phobos.game`. Dotyczy tylko projektu iOS; preset macOS w `project/` pozostaje bez zmian. Po pierwszym wydaniu nie można go zmienić. |
 | Ikona `project/icon.svg` | wygenerowana tak samo jak sprite'y | Status prawny jak sprite'y. iOS wymaga wersji 1024×1024 bez przezroczystości. |
 
@@ -61,6 +61,7 @@ Gałąź `feature/unity-port` przemianować na `port/ios`.
 - UE (Digital Services Act): wymagana deklaracja statusu tradera.
   - Gra płatna: trader, a adres, telefon i e-mail są publicznie widoczne w App Store.
   - Gra darmowa bez zakupów i bez działalności gospodarczej: można zadeklarować status nie-tradera.
+  - **Decyzja 2026-11-04: gra darmowa, deklaracja nie-tradera.**
 - Ekran licencji w aplikacji: MIT dla gry, OFL dla fontów, informacja o Godot (MIT) i jego
   bibliotekach zależnych.
 
@@ -114,8 +115,8 @@ pozostaje nietknięta, tak jak przy porcie Amigi. Obowiązują zasady z
 | 01 | `01-eksport-i-podpisywanie.md` | preset iOS, Xcode, podpis, `build.sh ios` |
 | 02 | `02-sterowanie-dotykowe.md` | wirtualne drążki i obsługa pada |
 | 03 | `03-ui-safe-area-i-proporcje.md` | layout iPhone/iPad, safe area, zapis |
-| 04 | `04-app-store-i-zgodnosc.md` | metadane, prywatność, licencje, trader |
-| 05 | `05-build-testy-i-akceptacja.md` | TestFlight, testy na sprzęcie, wydanie |
+| 04 | `04-app-store-i-zgodnosc.md` | Credits, privacy manifest, metadane i materiały do App Store Connect |
+| 05 | `05-build-testy-i-akceptacja.md` | build wydania, instrukcje; TestFlight i publikację robi użytkownik |
 
 ## Decyzje użytkownika
 
@@ -123,10 +124,12 @@ pozostaje nietknięta, tak jak przy porcie Amigi. Obowiązują zasady z
 |---|---|---|
 | 1 | Silnik | **Godot** |
 | 2 | Pochodzenie sprite'ów i ikony | **Wygenerowane przez AI** (Claude Code, Opus 5.5) |
-| 3 | Gra płatna czy darmowa | **Odłożone.** Trzeba zdecydować przed etapem 04, bo od tego zależą status tradera i umowa Paid Apps. Nie blokuje etapów 01–03. |
-| 4 | Bundle ID | **`com.marek.piotrowski.phobos`**. Nazwę w sklepie sprawdzimy w etapie 04. |
+| 3 | Gra płatna czy darmowa | **Darmowa**, bez zakupów w aplikacji i bez reklam (decyzja 2026-11-04). Status w UE: nie-trader. Umowa Paid Apps nie jest potrzebna. |
+| 4 | Bundle ID | **`com.marek.piotrowski.phobos`**. Nazwa w sklepie: patrz wiersz „Nazwa” w tabeli praw. |
 | 5 | Czy port iOS może zmieniać `project/` | **Nie.** Wersja macOS jest chroniona, iOS to osobny projekt w `ports/ios/project/`. |
 | 6 | PS5 jako opcja warunkowa | **Tak** |
+| 7 | Podział pracy przy wydaniu | **Użytkownik sam** wysyła build do TestFlight, testuje go i publikuje wydanie w App Store Connect. **Agent przygotowuje materiały:** kod (Credits, privacy manifest, Info.plist), teksty, listy kontrolne i instrukcje krok po kroku (2026-11-04). |
+| 8 | Testy ręczne etapów 01–03 | **Wykonane, wynik OK** (2026-11-04): iPhone, iPad, DualSense, safe area przy zimnym starcie, ikona, symbole ▲▼◀▶. |
 
 ## Bramka akceptacji
 

@@ -28,7 +28,7 @@ Plan, analiza licencji, wybór silnika (Godot vs Unity) i ocena PS5 są w
 
 | Platforma | Status początkowy | Warunek rozpoczęcia | Artefakt końcowy |
 |---|---|---|---|
-| iOS / iPadOS | `IN_PROGRESS` (etap 00 `APPROVED`) | Akceptacja kolejnych etapów portu iOS | Build `.ipa` zaakceptowany w App Store |
+| iOS / iPadOS | `IN_PROGRESS` (etapy 00–03 `APPROVED`, następny 04) | Akceptacja kolejnych etapów portu iOS | Build `.ipa` zaakceptowany w App Store |
 
 Port iOS podlega tej samej izolacji co porty retro: to osobny projekt Godot w
 `ports/ios/project/` (kopia `project/` z commitu zapisanego w `ports/ios/BASELINE`).

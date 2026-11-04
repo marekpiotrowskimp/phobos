@@ -66,3 +66,5 @@ Wymagania szczegółowe:
   przewagi ani straty względem pada zostaje odnotowany w raporcie.
 - Ocena „czy chcę zagrać jeszcze raz” wpisana jak w `docs/dziennik-sesji.md`.
 - Akceptacja użytkownika.
+
+**Status: `APPROVED`** (2026-11-04). Testy ręczne OK po strojeniu drążków, celowania i promienia zbierania kulek (0.9).
