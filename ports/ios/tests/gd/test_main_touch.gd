@@ -61,7 +61,7 @@ func test_mouse_emulation_from_touch_disabled(t) -> void:
 
 func test_menu_has_no_quit(t) -> void:
 	var main: Node = await t.spawn_main()
-	t.eq(["play", "difficulty", "results", "credits"], main.MENU_ITEMS, "iOS menu items: + LICENCJE (etap 04), no quit — Apple forbids quitting apps")
+	t.eq(["play", "difficulty", "controls", "results", "credits"], main.MENU_ITEMS, "iOS menu items: + STEROWANIE, + LICENCJE (etap 04), no quit — Apple forbids quitting apps")
 	var body: String = main.hud._screen_body.text
 	t.ok(body.contains("GRAJ") and body.contains("WYNIKI") and body.contains("LICENCJE"), "menu shows GRAJ, WYNIKI and LICENCJE")
 	t.ok(not body.contains("WYJŚCIE"), "menu does not show WYJŚCIE")
@@ -90,7 +90,7 @@ func test_menu_navigation_by_touch(t) -> void:
 	await t.tap(nav["menu_up"])
 	t.eq(0, main._menu_index, "tap ▲ selects PLAY")
 	await t.tap(nav["menu_up"])
-	t.eq(3, main._menu_index, "tap ▲ on PLAY wraps to LICENCJE (4 items)")
+	t.eq(4, main._menu_index, "tap ▲ on PLAY wraps to LICENCJE (5 items)")
 	await t.tap(nav["menu_down"])
 	await t.tap(nav["menu_confirm"])
 	t.eq("game", main.screen, "tap OK on PLAY starts a run")
@@ -171,6 +171,7 @@ func test_background_in_menu_changes_nothing(t) -> void:
 func test_background_releases_touch(t) -> void:
 	var main: Node = await t.spawn_main()
 	if _tc(t, main) == null: return
+	main.touch_controls.set_move_mode("classic")  # classic curve: 40 px → 0.8
 	main._start_run()
 	await t.frames(2)
 	await t.touch_down(0, Vector2(300, 400))

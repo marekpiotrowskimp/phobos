@@ -47,6 +47,7 @@ func test_layout_buttons_size_and_bounds(t) -> void:
 func test_left_stick_moves(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
+	tc.set_move_mode("classic")  # classic left stick (origin follows only beyond 80 px)
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_drag(0, Vector2(306, 400))
 	t.approx_v(Vector2.ZERO, _move(), "6 px (inside the 8 px dead zone) → player does not move", 0.01)
@@ -84,6 +85,7 @@ func test_right_stick_aims_and_fires(t) -> void:
 func test_two_sticks_independent(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
+	tc.set_move_mode("classic")  # classic left stick (origin follows only beyond 80 px)
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_down(1, Vector2(1000, 400))
 	await t.touch_drag(0, Vector2(328, 400))
@@ -156,6 +158,7 @@ func test_release_all(t) -> void:
 func test_pausing_releases_sticks(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
+	tc.set_move_mode("classic")  # classic left stick (origin follows only beyond 80 px)
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_drag(0, Vector2(340, 400))
 	t.approx_v(Vector2(0.8, 0.0), _move(), "moving before pause (40 px → 0.8)", 0.01)
@@ -180,6 +183,7 @@ func test_small_aim_is_full_length(t) -> void:
 func test_move_stick_keeps_graded_speed(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
+	tc.set_move_mode("classic")  # classic left stick (origin follows only beyond 80 px)
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_drag(0, Vector2(310, 400))
 	t.approx_v(Vector2(0.05, 0.0), _move(), "left stick stays graded: 10 px → 0.05 (unchanged)", 0.01)
@@ -188,6 +192,7 @@ func test_move_stick_keeps_graded_speed(t) -> void:
 func test_single_stick_radius(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
+	tc.set_move_mode("classic")  # classic left stick (origin follows only beyond 80 px)
 	t.eq(false, tc.get_script().get_script_constant_map().has("STICK_RADIUS"), "touch_controls has no own STICK_RADIUS — VirtualStick.radius is the only source")
 	t.approx(80.0, tc.left_stick.radius, "left stick radius 80 px (VirtualStick default)")
 	t.approx(80.0, tc.right_stick.radius, "right stick radius 80 px (VirtualStick default)")
@@ -196,6 +201,7 @@ func test_single_stick_radius(t) -> void:
 func test_knob_follows_finger(t) -> void:
 	var tc: Node = await t.spawn_touch("game", false)
 	if tc == null: return
+	tc.set_move_mode("classic")  # classic left stick (origin follows only beyond 80 px)
 	await t.touch_down(0, Vector2(300, 400))
 	await t.touch_drag(0, Vector2(320, 400))
 	t.approx_v(Vector2(320, 400), tc.knob_position(tc.left_stick), "20 px drag → knob under the finger")
