@@ -1,7 +1,7 @@
 extends Node3D
 
 # iOS: no "quit" item — apps must not terminate themselves (App Store guidelines).
-const MENU_ITEMS := ["play", "difficulty", "results", "credits"]
+const MENU_ITEMS := ["play", "difficulty", "controls", "results", "credits"]
 const TouchControlsScript := preload("res://scripts/touch/touch_controls.gd")
 const SafeArea := preload("res://scripts/ui/safe_area.gd")
 const AimAssist := preload("res://scripts/touch/aim_assist.gd")
@@ -58,6 +58,8 @@ var _max_alive_seen := 0
 var _director_violation := false
 var _kills_since_heal_drop := 0
 var _credits_text := ""
+## Move-stick mode chosen in the menu during this app run ("" = not chosen, the default applies).
+static var session_move_mode := ""
 var _heal_drops := 0
 var _overdrive_drops := 0
 var _forced_heals := 0
@@ -101,6 +103,8 @@ func _ready() -> void:
 	touch_controls.source = self
 	touch_controls.aim_assist = _touch_aim_assist
 	add_child(touch_controls)
+	if session_move_mode != "":
+		touch_controls.set_move_mode(session_move_mode)
 	get_viewport().size_changed.connect(_on_viewport_resized)
 	_on_viewport_resized()
 	player = Player.new()
@@ -596,7 +600,10 @@ func _show_main_menu() -> void:
 	state = "over"
 	_menu_index = clampi(_menu_index, 0, MENU_ITEMS.size() - 1)
 	get_tree().paused = true
-	hud.show_main_menu(_menu_index, _difficulty_label(GameState.selected_difficulty))
+	_refresh_main_menu()
+
+func _refresh_main_menu() -> void:
+	hud.show_main_menu(_menu_index, _difficulty_label(GameState.selected_difficulty), _move_mode_label())
 
 func _handle_menu_input(event: InputEvent) -> void:
 	if event.is_action_pressed("menu_up"):
@@ -607,19 +614,34 @@ func _handle_menu_input(event: InputEvent) -> void:
 		_cycle_difficulty(-1)
 	elif event.is_action_pressed("menu_right") and MENU_ITEMS[_menu_index] == "difficulty":
 		_cycle_difficulty(1)
+	elif (event.is_action_pressed("menu_left") or event.is_action_pressed("menu_right")) and MENU_ITEMS[_menu_index] == "controls":
+		_toggle_move_mode()
 	elif event.is_action_pressed("menu_confirm"):
 		match MENU_ITEMS[_menu_index]:
 			"play":
 				_start_run()
 			"difficulty":
 				_cycle_difficulty(1)
+			"controls":
+				_toggle_move_mode()
 			"results":
 				_results_filter_index = 0
 				_show_results(false)
 			"credits":
 				_show_credits()
 		return
-	hud.show_main_menu(_menu_index, _difficulty_label(GameState.selected_difficulty))
+	_refresh_main_menu()
+
+## Two modes only, so ◀ ▶ and OK all switch to the other one. The choice lasts for the session
+## (kept across scene reloads in session_move_mode), it is not written to disk.
+func _toggle_move_mode() -> void:
+	var modes: Array = touch_controls.move_modes()
+	var next: String = modes[(modes.find(touch_controls.move_mode) + 1) % modes.size()]
+	touch_controls.set_move_mode(next)
+	session_move_mode = next
+
+func _move_mode_label() -> String:
+	return Localization.t("controls_" + str(touch_controls.move_mode))
 
 func _cycle_difficulty(direction: int) -> void:
 	var index := GameState.DIFFICULTY_IDS.find(GameState.selected_difficulty)

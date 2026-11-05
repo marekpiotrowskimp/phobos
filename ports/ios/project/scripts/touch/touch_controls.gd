@@ -28,6 +28,16 @@ const ICON_BUTTONS := {
 	"menu_up": "arrow_up", "menu_down": "arrow_down", "menu_left": "arrow_left",
 	"menu_right": "arrow_right", "pause": "pause",
 }
+## Left (move) stick modes:
+##   leash   — the stick centre trails the thumb 40 px behind, so the direction follows the latest
+##             thumb movement (turning needs only a short stroke); full speed at 30 px
+##   classic — the centre stays where the thumb landed until the thumb is 80 px away; full at 48 px
+## The aim stick keeps the VirtualStick defaults in both modes.
+const MOVE_MODES := {
+	"leash": {"radius": 40.0, "full_at": 0.75},
+	"classic": {"radius": 80.0, "full_at": 0.6},
+}
+const DEFAULT_MOVE_MODE := "leash"
 const BUTTON_FONT_FILE := preload("res://assets/fonts/Oxanium-Variable.ttf")
 const BUTTON_FONT_WEIGHT := 600.0
 const BUTTON_FONT_SIZE := 28
@@ -47,6 +57,8 @@ var aim_assist := Callable()
 
 var left_stick := VirtualStick.new()
 var right_stick := VirtualStick.new()
+## Left (move) stick behaviour, see MOVE_MODES.
+var move_mode := ""
 
 var _overlay_visible := true
 ## Safe-area margins in canvas pixels; buttons are laid out inside them.
@@ -54,6 +66,10 @@ var _safe := {"left": 0.0, "top": 0.0, "right": 0.0, "bottom": 0.0}
 var _owned_actions := {}
 var _canvas: Control
 var _button_font: FontVariation
+
+
+func _init() -> void:
+	set_move_mode(DEFAULT_MOVE_MODE)
 
 
 func _ready() -> void:
@@ -354,3 +370,21 @@ func _draw_icon(icon: String, r: Rect2) -> void:
 			else:
 				_canvas.draw_line(Vector2(x, c.y - s * 0.45), Vector2(x + s * 0.8, c.y + s * 0.45), COLOR_TEXT, 3.0)
 				_canvas.draw_line(Vector2(x, c.y + s * 0.45), Vector2(x + s * 0.8, c.y - s * 0.45), COLOR_TEXT, 3.0)
+
+
+# ------------------------------------------------------------ move modes
+
+## Applies a left-stick mode from MOVE_MODES; unknown names are ignored.
+func set_move_mode(mode: String) -> void:
+	if not MOVE_MODES.has(mode):
+		return
+	move_mode = mode
+	var params: Dictionary = MOVE_MODES[mode]
+	left_stick.radius = float(params["radius"])
+	left_stick.full_at = float(params["full_at"])
+
+
+func move_modes() -> Array:
+	var names := MOVE_MODES.keys()
+	names.sort()
+	return names

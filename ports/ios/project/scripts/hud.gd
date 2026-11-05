@@ -362,9 +362,10 @@ func show_gameplay(difficulty: String) -> void:
 	difficulty_label.text = Localization.t("hud_level") % difficulty
 	set_gameplay_visible(true)
 
-func show_main_menu(selected: int, difficulty: String) -> void:
+func show_main_menu(selected: int, difficulty: String, controls: String = "") -> void:
 	var entries := [Localization.t("menu_play"), Localization.t("menu_difficulty") % difficulty,
-		Localization.t("menu_results"), Localization.t("menu_credits")]
+		Localization.t("menu_controls") % controls, Localization.t("menu_results"),
+		Localization.t("menu_credits")]
 	var lines := PackedStringArray()
 	for i in entries.size():
 		lines.append((">  %s  <" if i == selected else "   %s   ") % entries[i])
