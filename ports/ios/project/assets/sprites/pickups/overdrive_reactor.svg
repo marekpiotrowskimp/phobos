@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#697488"/>
+      <stop offset="0.4" stop-color="#293344"/>
+      <stop offset="1" stop-color="#0a101b"/>
+    </linearGradient>
+    <radialGradient id="plasma">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.18" stop-color="#7ff8ff"/>
+      <stop offset="0.52" stop-color="#2389ff"/>
+      <stop offset="1" stop-color="#3420a4"/>
+    </radialGradient>
+  </defs>
+  <path d="M128 11 L181 31 L224 78 L238 128 L222 180 L180 225 L128 244 L75 225 L33 180 L18 128 L34 76 L76 31 Z" fill="#050812" stroke="#02040a" stroke-width="12"/>
+  <path d="M128 27 L174 44 L207 82 L220 128 L207 174 L173 211 L128 228 L82 211 L48 174 L35 128 L49 82 L83 44 Z" fill="url(#metal)" stroke="#294f82" stroke-width="6"/>
+  <path d="M128 48 L169 62 L194 96 L197 139 L177 179 L142 203 L99 194 L68 165 L59 123 L76 83 Z" fill="#0a1830" stroke="#3b86cb" stroke-width="7"/>
+  <circle cx="128" cy="128" r="55" fill="none" stroke="#54dfff" stroke-width="10" stroke-dasharray="24 13"/>
+  <circle cx="128" cy="128" r="38" fill="url(#plasma)" stroke="#b7fbff" stroke-width="6"/>
+  <path d="M132 76 L104 122 L125 119 L109 174 L157 112 L134 116 L150 76 Z" fill="#e9ffff" stroke="#1257cc" stroke-width="5" stroke-linejoin="round"/>
+  <g fill="#5be8ff" stroke="#071020" stroke-width="4">
+    <path d="M68 43 L96 37 L91 61 L70 70 Z"/>
+    <path d="M188 43 L160 37 L165 61 L186 70 Z"/>
+    <path d="M68 213 L96 219 L91 195 L70 186 Z"/>
+    <path d="M188 213 L160 219 L165 195 L186 186 Z"/>
+  </g>
+  <g stroke="#91a0b3" stroke-width="4" opacity="0.55" stroke-linecap="round">
+    <path d="M45 113 L57 90"/>
+    <path d="M211 113 L199 90"/>
+    <path d="M45 148 L59 173"/>
+    <path d="M211 148 L197 173"/>
+  </g>
+</svg>

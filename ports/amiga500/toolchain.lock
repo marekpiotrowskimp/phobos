@@ -2,3 +2,8 @@ AMIGA_GCC_REPOSITORY=https://github.com/AmigaPorts/m68k-amigaos-gcc.git
 AMIGA_GCC_COMMIT=7d3e35f58e61bdf325d84b912b139f973d9b7452
 AMITOOLS_VERSION=0.8.1
 PROJECT_TREE_BASELINE=52f14fee42de99063214f69f1acee2fba8f0e89a
+# Sub-repository cloned by the m68k-amigaos-gcc Makefile from a branch HEAD.
+# Pinned to the last commit with the per-directory libpthread build (lib,
+# libb, libm020, libm020bb, libm020bb32) that this Makefile installs; 9e09fb0+ switched to compiler multilibs.
+AROS_STUFF_REPOSITORY=https://github.com/AmigaPorts/aros-stuff
+AROS_STUFF_COMMIT=c8d4ddc8e6a4af68c1651c191ac89a9bd9003ca2

@@ -20,6 +20,20 @@ Status Amigi jest nadawany wyłącznie przez użytkownika w
 `ports/amiga500/docs/05-build-testy-i-akceptacja.md`. Samo przejście testów nie
 odblokowuje C64.
 
+## Port iOS / iPadOS (osobna ścieżka)
+
+Port na iPhone i iPad nie jest portem retro i nie zależy od kolejności Amiga → C64.
+Plan, analiza licencji, wybór silnika (Godot vs Unity) i ocena PS5 są w
+`ports/ios/docs/00-zalozenia-licencje-i-platformy.md`.
+
+| Platforma | Status początkowy | Warunek rozpoczęcia | Artefakt końcowy |
+|---|---|---|---|
+| iOS / iPadOS | `IN_PROGRESS` (etapy 00–03 `APPROVED`, następny 04) | Akceptacja kolejnych etapów portu iOS | Build `.ipa` zaakceptowany w App Store |
+
+Port iOS podlega tej samej izolacji co porty retro: to osobny projekt Godot w
+`ports/ios/project/` (kopia `project/` z commitu zapisanego w `ports/ios/BASELINE`).
+Port nie modyfikuje `project/` (decyzja użytkownika z 2026-11-03).
+
 ## Izolacja platform
 
 - `project/` pozostaje jedynym źródłem wersji Godot/macOS i nie jest modyfikowany przez porty.

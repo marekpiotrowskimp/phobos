@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="armor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#43505a"/>
+      <stop offset="0.45" stop-color="#202a32"/>
+      <stop offset="1" stop-color="#0b1117"/>
+    </linearGradient>
+    <linearGradient id="armorLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#66747d"/>
+      <stop offset="0.35" stop-color="#303d45"/>
+      <stop offset="1" stop-color="#11181e"/>
+    </linearGradient>
+    <linearGradient id="gun" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5d676c"/>
+      <stop offset="0.4" stop-color="#242d32"/>
+      <stop offset="1" stop-color="#080d11"/>
+    </linearGradient>
+    <radialGradient id="visor">
+      <stop offset="0" stop-color="#d9ffff"/>
+      <stop offset="0.35" stop-color="#39f4ff"/>
+      <stop offset="1" stop-color="#08758b"/>
+    </radialGradient>
+    <radialGradient id="reactor">
+      <stop offset="0" stop-color="#efffff"/>
+      <stop offset="0.25" stop-color="#4ef5ff"/>
+      <stop offset="0.7" stop-color="#087e98"/>
+      <stop offset="1" stop-color="#072a35"/>
+    </radialGradient>
+  </defs>
+
+  <g stroke="#05080b" stroke-width="12" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M177 332 L154 391 L161 456 L211 459 L224 402 L221 344 Z" fill="url(#armor)"/>
+    <path d="M272 344 L278 406 L300 459 L350 452 L344 389 L321 327 Z" fill="url(#armor)"/>
+    <path d="M173 415 L152 449 L157 476 L214 476 L221 449 L205 419 Z" fill="#11191f"/>
+    <path d="M302 418 L286 449 L296 476 L353 471 L357 445 L335 414 Z" fill="#11191f"/>
+
+    <path d="M161 211 L122 225 L99 282 L120 329 L170 320 L188 264 Z" fill="url(#armorLight)"/>
+    <path d="M337 209 L382 220 L405 270 L387 322 L338 316 L321 260 Z" fill="url(#armorLight)"/>
+    <path d="M132 297 L101 325 L111 367 L154 372 L181 323 Z" fill="url(#armor)"/>
+    <path d="M369 294 L402 316 L402 358 L364 379 L329 322 Z" fill="url(#armor)"/>
+
+    <path d="M173 184 L213 154 L299 155 L339 187 L352 278 L326 361 L286 389 L211 386 L170 350 L154 273 Z" fill="url(#armor)"/>
+    <path d="M202 225 L226 204 L287 204 L316 229 L307 323 L280 351 L223 348 L197 318 Z" fill="#172229"/>
+    <path d="M213 246 L235 224 L280 225 L301 247 L293 303 L272 325 L233 323 L211 302 Z" fill="url(#armorLight)"/>
+
+    <path d="M196 125 L219 92 L289 91 L317 123 L325 190 L295 220 L218 218 L187 188 Z" fill="url(#armorLight)"/>
+    <path d="M207 139 L225 112 L283 111 L303 137 L302 180 L284 198 L223 198 L207 178 Z" fill="#111a20"/>
+    <path d="M214 142 L234 125 L276 125 L296 142 L289 167 L221 168 Z" fill="url(#visor)" stroke-width="8"/>
+
+    <path d="M326 190 L363 172 L387 193 L371 236 L340 250 L315 228 Z" fill="url(#armor)"/>
+    <path d="M352 177 L362 85 L390 43 L421 51 L414 109 L395 181 L385 228 L354 225 Z" fill="url(#gun)"/>
+    <path d="M365 91 L374 45 L396 25 L426 31 L425 63 L406 99 Z" fill="#141c20"/>
+    <path d="M377 127 L402 128 L415 163 L395 179 L371 163 Z" fill="#0c1318"/>
+    <path d="M338 235 L370 227 L394 254 L376 282 L337 270 Z" fill="url(#gun)"/>
+  </g>
+
+  <g fill="none" stroke-linecap="round">
+    <path d="M184 235 L168 281 L180 329" stroke="#7e929b" stroke-width="7" opacity="0.55"/>
+    <path d="M329 234 L339 281 L327 327" stroke="#7e929b" stroke-width="7" opacity="0.45"/>
+    <path d="M185 352 L207 364 L219 405" stroke="#61717a" stroke-width="8" opacity="0.55"/>
+    <path d="M323 348 L299 365 L290 407" stroke="#61717a" stroke-width="8" opacity="0.55"/>
+    <path d="M368 105 L406 104" stroke="#95a6ad" stroke-width="5" opacity="0.5"/>
+    <path d="M374 74 L415 71" stroke="#95a6ad" stroke-width="4" opacity="0.45"/>
+  </g>
+
+  <path d="M232 240 L255 226 L279 241 L275 291 L255 308 L235 292 Z" fill="#071419" stroke="#071f28" stroke-width="6"/>
+  <circle cx="255" cy="261" r="22" fill="url(#reactor)" stroke="#62f7ff" stroke-width="5"/>
+  <circle cx="255" cy="261" r="7" fill="#e9ffff"/>
+
+  <g fill="#4defff" stroke="#061217" stroke-width="5">
+    <path d="M157 240 L137 246 L126 276 L139 284 L162 267 Z"/>
+    <path d="M343 237 L367 241 L379 269 L366 279 L342 263 Z"/>
+    <path d="M184 376 L204 385 L201 410 L178 405 Z"/>
+    <path d="M310 381 L331 372 L338 402 L315 411 Z"/>
+    <path d="M365 113 L386 114 L381 143 L361 141 Z"/>
+  </g>
+
+  <g fill="#d8b24d" stroke="#11100a" stroke-width="4">
+    <path d="M162 196 L182 181 L197 197 L174 216 Z"/>
+    <path d="M310 198 L326 181 L345 196 L328 216 Z"/>
+    <path d="M238 335 L273 335 L268 347 L241 347 Z"/>
+  </g>
+
+  <g stroke="#9ba8ac" stroke-width="4" opacity="0.45" stroke-linecap="round">
+    <path d="M230 181 L250 174"/>
+    <path d="M275 187 L291 176"/>
+    <path d="M225 276 L242 269"/>
+    <path d="M278 314 L290 304"/>
+    <path d="M126 338 L143 331"/>
+    <path d="M314 439 L333 436"/>
+  </g>
+</svg>
