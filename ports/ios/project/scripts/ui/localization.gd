@@ -9,9 +9,6 @@ const STRINGS := {
 	"pl": {
 		"menu_play": "GRAJ",
 		"menu_difficulty": "TRUDNOŚĆ: < %s >",
-		"menu_controls": "STEROWANIE: < %s >",
-		"controls_leash": "NOWE",
-		"controls_classic": "KLASYCZNE",
 		"menu_results": "WYNIKI",
 		"menu_credits": "LICENCJE",
 		"hint_menu": "GÓRA/DÓŁ WYBÓR  •  OK",
@@ -49,9 +46,6 @@ const STRINGS := {
 	"en": {
 		"menu_play": "PLAY",
 		"menu_difficulty": "DIFFICULTY: < %s >",
-		"menu_controls": "CONTROLS: < %s >",
-		"controls_leash": "NEW",
-		"controls_classic": "CLASSIC",
 		"menu_results": "SCORES",
 		"menu_credits": "LICENSES",
 		"hint_menu": "UP/DOWN SELECT  •  OK",
