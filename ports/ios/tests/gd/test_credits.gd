@@ -27,10 +27,10 @@ func _press(t, action: String) -> void:
 	await t.frames(2)
 
 
-## Main menu → LICENCJE (5th item) → OK.
+## Main menu → LICENCJE (4th item) → OK.
 func _open_credits(t) -> Node:
 	var main: Node = await t.spawn_main()
-	for i in 4:
+	for i in 3:
 		await _press(t, "menu_down")
 	await _press(t, "menu_confirm")
 	await t.frames(2)
@@ -91,9 +91,9 @@ func test_credits_ai_graphics_note(t) -> void:
 
 func test_menu_shows_licences_item(t) -> void:
 	var main: Node = await t.spawn_main()
-	for i in 4:
+	for i in 3:
 		await _press(t, "menu_down")
-	t.eq(4, main._menu_index, "LICENCJE is the 5th menu item")
+	t.eq(3, main._menu_index, "LICENCJE is the 4th menu item")
 	t.ok(main.hud._screen_body.text.contains(">  LICENCJE  <"), "LICENCJE highlighted (got %s)" % main.hud._screen_body.text)
 
 
@@ -135,7 +135,7 @@ func test_credits_back_returns_to_menu(t) -> void:
 	var main: Node = await _open_credits(t)
 	await _press(t, "menu_back")
 	t.eq("menu", main.screen, "WSTECZ returns to the menu")
-	t.eq(4, main._menu_index, "LICENCJE stays selected")
+	t.eq(3, main._menu_index, "LICENCJE stays selected")
 	t.ok(main.hud._screen_body.text.contains(">  LICENCJE  <"), "menu shown again")
 	await _press(t, "menu_confirm")
 	t.eq("credits", main.screen, "can open the credits again")

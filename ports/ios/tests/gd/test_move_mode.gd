@@ -1,13 +1,11 @@
 extends RefCounted
-# Sterowanie ruchem: dwa tryby lewego drążka, przełączane w menu głównym.
-#   "leash"   (NOWE, domyślne) — krótka smycz: środek drążka idzie za kciukiem 40 px z tyłu,
-#             pełna prędkość przy 30 px, martwa strefa 8 px; kierunek ≈ ostatni ruch kciuka.
-#   "classic" (KLASYCZNE) — dotychczasowe: środek zostaje, dopóki kciuk nie odjedzie 80 px,
-#             pełna prędkość przy 48 px.
-# Prawy drążek (celowanie) jest w obu trybach taki sam. Wybór obowiązuje do końca sesji
-# (także po przeładowaniu sceny, np. „GRAJ PONOWNIE”), nie jest zapisywany na dysku.
+# Sterowanie ruchem lewym kciukiem: „smycz” — jedyne sterowanie dotykowe w grze.
+#   środek drążka idzie za kciukiem 40 px z tyłu, pełna prędkość przy 30 px, martwa strefa 8 px;
+#   kierunek ≈ ostatni ruch kciuka.
+# Menu główne nie ma już pozycji STEROWANIE (decyzja po testach na iPhonie). Tryb "classic"
+# zostaje tylko w TouchControls (API set_move_mode), bez dostępu z interfejsu gry.
+# Prawy drążek (celowanie) bez zmian.
 
-const SETTINGS_FILE := "user://ios_settings.cfg"
 const PLAYER_MOVE_DEADZONE := 0.28
 
 
@@ -112,52 +110,63 @@ func test_leash_keeps_direction_when_thumb_stops(t) -> void:
 	t.approx_v(Vector2.ZERO, _move(), "lifting the thumb stops", 0.001)
 
 
-# ------------------------------------------------------------ menu główne
+# ------------------------------------------------------------ menu główne: bez przełącznika
 
-func test_menu_shows_controls_pl(t) -> void:
+const REMOVED_KEYS := ["menu_controls", "controls_leash", "controls_classic"]
+
+
+func test_menu_has_no_controls_item_pl(t) -> void:
 	var main: Node = await t.spawn_main()
-	t.eq("controls", main.MENU_ITEMS[2], "3rd menu item")
-	t.eq("leash", main.touch_controls.move_mode, "game starts with the leash mode")
-	t.ok(main.hud._screen_body.text.contains("STEROWANIE: < NOWE >"), "menu PL (got %s)" % main.hud._screen_body.text)
+	t.eq(["play", "difficulty", "results", "credits"], main.MENU_ITEMS, "4 menu items, no controls")
+	var body: String = main.hud._screen_body.text
+	t.eq(4, body.split("\n").size(), "menu shows 4 lines (got %s)" % body)
+	t.ok(not body.contains("STEROWANIE") and not body.contains("NOWE") and not body.contains("KLASYCZNE"), "no STEROWANIE line (got %s)" % body)
+	t.eq("leash", main.touch_controls.move_mode, "game starts with the leash steering")
 
 
-func test_menu_shows_controls_en(t) -> void:
+func test_menu_has_no_controls_item_en(t) -> void:
 	t.set_language("en")
 	var main: Node = await t.spawn_main()
-	t.ok(main.hud._screen_body.text.contains("CONTROLS: < NEW >"), "menu EN (got %s)" % main.hud._screen_body.text)
+	var body: String = main.hud._screen_body.text
+	t.eq(4, body.split("\n").size(), "menu shows 4 lines (got %s)" % body)
+	t.ok(not body.contains("CONTROLS") and not body.contains("NEW") and not body.contains("CLASSIC"), "no CONTROLS line (got %s)" % body)
+
+
+func test_menu_left_right_do_not_change_steering(t) -> void:
+	var main: Node = await t.spawn_main()
+	for i in main.MENU_ITEMS.size():
+		main._menu_index = i
+		if main.MENU_ITEMS[i] in ["play", "credits", "results"]:
+			for action in ["menu_left", "menu_right"]:
+				await _press(t, action)
+				t.eq("leash", main.touch_controls.move_mode, "%s on %s keeps the leash" % [action, main.MENU_ITEMS[i]])
+				t.eq("menu", main.screen, "%s on %s stays in the menu" % [action, main.MENU_ITEMS[i]])
 	main._menu_index = 2
 	await _press(t, "menu_right")
-	t.ok(main.hud._screen_body.text.contains("CONTROLS: < CLASSIC >"), "EN classic label")
+	t.eq("leash", main.touch_controls.move_mode, "3rd item (WYNIKI) ▶ does not switch steering")
 
 
-func test_menu_toggles(t) -> void:
-	var main: Node = await t.spawn_main()
-	await _press(t, "menu_down")
-	await _press(t, "menu_down")
-	t.eq(2, main._menu_index, "STEROWANIE selected")
-	t.ok(main.hud._screen_body.text.contains(">  STEROWANIE: < NOWE >  <"), "highlighted (got %s)" % main.hud._screen_body.text)
-	await _press(t, "menu_right")
-	t.eq("classic", main.touch_controls.move_mode, "▶ switches to classic")
-	t.ok(main.hud._screen_body.text.contains("STEROWANIE: < KLASYCZNE >"), "label KLASYCZNE")
-	await _press(t, "menu_left")
-	t.eq("leash", main.touch_controls.move_mode, "◀ switches back")
-	await _press(t, "menu_confirm")
-	t.eq("classic", main.touch_controls.move_mode, "OK also toggles")
-	t.eq("menu", main.screen, "OK on STEROWANIE stays in the menu")
-	t.eq(false, FileAccess.file_exists(SETTINGS_FILE), "session only: nothing is written to disk")
-	t.eq(false, FileAccess.get_file_as_string("user://phobos.cfg").contains("classic"), "GameState save untouched")
-
-
-func test_choice_survives_scene_reload(t) -> void:
+func test_reload_always_starts_with_leash(t) -> void:
 	var first: Node = await t.spawn_main()
 	first._menu_index = 2
-	await _press(t, "menu_right")
-	t.eq("classic", first.touch_controls.move_mode, "classic chosen")
+	await _press(t, "menu_right")  # was: STEROWANIE ▶ → classic for the session
 	first.queue_free()
 	await t.frames(2)
 	var second: Node = await t.spawn_main()  # same app run, scene loaded again (e.g. GRAJ PONOWNIE)
-	t.eq("classic", second.touch_controls.move_mode, "choice kept for the rest of the session")
-	t.ok(second.hud._screen_body.text.contains("STEROWANIE: < KLASYCZNE >"), "menu shows the session choice")
+	t.eq("leash", second.touch_controls.move_mode, "after a reload the steering is still the leash")
+	t.eq(false, "session_move_mode" in second, "no session steering override in main")
+
+
+func test_controls_texts_removed(t) -> void:
+	for lang in ["pl", "en"]:
+		var keys: Array = _keys(lang)
+		for key in REMOVED_KEYS:
+			t.ok(not keys.has(key), "%s: text '%s' removed" % [lang, key])
+
+
+func _keys(lang: String) -> Array:
+	var script: Script = load("res://scripts/ui/localization.gd")
+	return script.keys(lang)
 
 
 func test_mode_used_in_game(t) -> void:
