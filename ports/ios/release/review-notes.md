@@ -5,7 +5,7 @@ Sign-in required: **No**. Kontakt: Marek Piotrowski, marek.piotrowski.mp@gmail.c
 
 ## Notes for App Review
 
-PHOBOS: Arena Survival is a single-player twin-stick survival shooter. No account or sign-in is needed, there are no ads and no in-app purchases, and the game plays fully offline — it does not use the network.
+PHOBOS Survivor is a single-player twin-stick survival shooter. No account or sign-in is needed, there are no ads and no in-app purchases, and the game plays fully offline — it does not use the network.
 
 How to play (touch controls):
 - In the main menu use the on-screen up/down arrow buttons and OK to choose PLAY.

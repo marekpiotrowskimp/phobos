@@ -1,10 +1,10 @@
-# PHOBOS: Arena Survival — Polityka prywatności / Privacy Policy
+# PHOBOS Survivor — Polityka prywatności / Privacy Policy
 
 Obowiązuje od / Effective date: 2026-11-04
 
 ## Polski
 
-Gra PHOBOS: Arena Survival („gra”) nie zbiera, nie przechowuje na serwerach ani nie przekazuje
+Gra PHOBOS Survivor („gra”) nie zbiera, nie przechowuje na serwerach ani nie przekazuje
 żadnych danych osobowych ani danych o użytkowaniu.
 
 - Gra nie wymaga konta, nie wyświetla reklam i nie zawiera zakupów w aplikacji.
@@ -20,7 +20,7 @@ Kontakt: Marek Piotrowski, marek.piotrowski.mp@gmail.com
 
 ## English
 
-PHOBOS: Arena Survival (“the game”) does not collect, store on servers or share any personal
+PHOBOS Survivor (“the game”) does not collect, store on servers or share any personal
 data or usage data.
 
 - The game requires no account, shows no ads and has no in-app purchases.

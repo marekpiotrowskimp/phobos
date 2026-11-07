@@ -3,7 +3,7 @@
 # oraz materiały do App Store Connect w ports/ios/release/ (agent przygotowuje, użytkownik wkleja).
 
 RELEASE="$IOS_DIR/release"
-APP_NAME="PHOBOS: Arena Survival"
+APP_NAME="PHOBOS Survivor"
 
 # ------------------------------------------------------------ ekran LICENCJE (gd)
 test_store_credits_game_licence()        { run_gd test_credits.gd test_credits_game_licence; }

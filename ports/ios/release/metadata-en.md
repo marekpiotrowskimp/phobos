@@ -4,7 +4,7 @@ Paste each section into the matching App Store Connect field (App Store → loca
 Apple's character limits are checked by `test_store_metadata_en`.
 
 ## Name
-PHOBOS: Arena Survival
+PHOBOS Survivor
 
 ## Subtitle
 Twin-stick survival shooter

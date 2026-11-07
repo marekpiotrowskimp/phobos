@@ -4,7 +4,7 @@ Wklej każdą sekcję do odpowiedniego pola w App Store Connect → App Store �
 Limity znaków Apple są sprawdzane testem `test_store_metadata_pl`.
 
 ## Name
-PHOBOS: Arena Survival
+PHOBOS Survivor
 
 ## Subtitle
 Przetrwaj inwazję na arenie

@@ -1,4 +1,4 @@
-# PHOBOS: Arena Survival — Wsparcie / Support
+# PHOBOS Survivor — Wsparcie / Support
 
 ## Polski
 

@@ -8,7 +8,7 @@ gotowe odpowiedzi. Kolejność odpowiada ekranom ASC. Pola tekstowe sklepu są w
 
 - [ ] **My Apps → + → New App**
   - Platforms: iOS
-  - Name: **PHOBOS: Arena Survival** (zapasowe: „PHOBOS Arena”, „PHOBOS: Twin-Stick Survival”)
+  - Name: **PHOBOS Survivor** (zarezerwowana w App Store Connect)
   - Primary Language: Polish (dodaj też lokalizację English (U.S.))
   - Bundle ID: **com.marek.piotrowski.phobos**
   - SKU: `phobos-ios`
@@ -82,9 +82,10 @@ Wynik wylicza ASC; spodziewana kategoria to 9+ albo 13+ zależnie od odpowiedzi 
 
 ## URLs
 
-Strony są w publicznym repozytorium i zaczną działać po scaleniu gałęzi `port/ios` do `main`.
+Strony HTML (EN + PL) są w `docs/` i są publikowane przez GitHub Pages z gałęzi `main`, katalog `/docs`
+(Settings → Pages → Deploy from a branch → `main` / `/docs`). Zaczną działać po scaleniu `port/ios` do `main`.
 Przed wpisaniem sprawdź, czy otwierają się w przeglądarce bez logowania.
 
-- Support URL: https://github.com/marekpiotrowskimp/phobos/blob/main/ports/ios/release/support.md
-- Privacy Policy URL: https://github.com/marekpiotrowskimp/phobos/blob/main/ports/ios/release/privacy-policy.md
-- Marketing URL (opcjonalnie): https://github.com/marekpiotrowskimp/phobos
+- Support URL: https://marekpiotrowskimp.github.io/phobos/support.html (PL: `support_pl.html`)
+- Privacy Policy URL: https://marekpiotrowskimp.github.io/phobos/privacy_policy.html (PL: `privacy_policy_pl.html`)
+- Marketing URL (opcjonalnie): https://marekpiotrowskimp.github.io/phobos/support.html

@@ -38,7 +38,7 @@ Materiały do wklejenia trafiają do katalogu `ports/ios/release/`:
 ## Nazwa
 
 - „Phobos” jest już zajęty w App Store przez aplikację użytkową Enginko SRL (sprawdzone 2026-11-04).
-- Propozycja: **„PHOBOS: Arena Survival”**. Zapasowe: „PHOBOS Arena”, „PHOBOS: Twin-Stick Survival”.
+- Wybrana i zarezerwowana w App Store Connect: **„PHOBOS Survivor”**.
 - Użytkownik rezerwuje nazwę przy tworzeniu aplikacji w App Store Connect. Nazwa pod ikoną
   (`CFBundleDisplayName`) zostaje „PHOBOS”, bo może się różnić od nazwy w sklepie.
 
@@ -68,7 +68,7 @@ to osobna decyzja w ramach rozwoju `project/`.
 
 | Pole | Treść |
 |---|---|
-| Nazwa | „PHOBOS: Arena Survival” (patrz „Nazwa”) |
+| Nazwa | „PHOBOS Survivor” (patrz „Nazwa”) |
 | Podtytuł | np. „Twin-stick survival shooter” |
 | Kategoria | Games → Action (dodatkowa: Arcade) |
 | Klasyfikacja wiekowa | kwestionariusz: przemoc fantastyczna/rysunkowa, brak realistycznej krwi (do weryfikacji, bo arena ma „ślady krwi”). Gotowe odpowiedzi w checkliście. |
