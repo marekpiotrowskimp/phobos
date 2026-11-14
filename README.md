@@ -1,13 +1,13 @@
 # PHOBOS
 
-A twin-stick survival shooter made in **Godot**, with ports for the **Amiga 500** and **Commodore 64**.
+A twin-stick survival shooter made in **Godot**, with ports for the **Amiga 500** and **iOS**.
 
 | Directory | Contents |
 |---|---|
 | [`project/`](project/) | Main version — Godot 4, macOS |
 | [`ports/amiga500/`](ports/amiga500/) | Amiga 500 port (C, m68k-amigaos toolchain, `Makefile`, `toolchain.lock`) |
-| [`ports/commodore64/`](ports/commodore64/) | C64 port documentation |
-| [`docs/`](docs/) | Game design |
+| [`ports/ios/`](ports/ios/) | iOS port (Godot 4, touch controls) |
+| [`docs/`](docs/) | Privacy policy & support (App Store) |
 
 ## Controls
 

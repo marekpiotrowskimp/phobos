@@ -14,3 +14,14 @@ ports/*/assets/generated/preview/
 .env
 secrets.h
 secrets.py
+
+# materiały robocze (lokalnie)
+docs/*.md
+docs/etapy/
+docs/porty/
+marketing/
+ports/amiga500/docs/
+ports/commodore64/
+ports/ios/docs/
+ports/ios/release/
+ports/ios/tests/test_11_app_store.sh
